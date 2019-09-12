@@ -56,7 +56,12 @@ namespace Sino.Nacos.Config.Filter
 
             public void DoFilter(IConfigRequest request, IConfigResponse response)
             {
-                if (t)
+                if (currentPosition != additionalFilters.Count)
+                {
+                    currentPosition++;
+                    IConfigFilter nextFilter = additionalFilters[currentPosition - 1];
+                    nextFilter.DoFilter(request, response, this);
+                }
             }
         }
     }
