@@ -17,7 +17,7 @@ namespace Sino.Nacos.Naming.Core
     {
         public const int TAKE_WAIT_MILLISECONDS_TIMEOUT = 5 * 60 * 1000;
 
-        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// 服务变更列表
@@ -57,7 +57,7 @@ namespace Sino.Nacos.Naming.Core
                         }
                         catch(Exception ex)
                         {
-                            logger.Error(ex, $"[NA] notify error for service: {info.Name}, clusters: {info.Clusters}");
+                            _logger.Error(ex, $"[NA] notify error for service: {info.Name}, clusters: {info.Clusters}");
                         }
                     }
                     else
@@ -73,7 +73,7 @@ namespace Sino.Nacos.Naming.Core
         /// </summary>
         public void AddListener(ServiceInfo serviceInfo, string clusters, Action<IEvent> listener)
         {
-            logger.Info($"[LISTENER] adding {serviceInfo.Name} with {clusters} to listener map");
+            _logger.Info($"[LISTENER] adding {serviceInfo.Name} with {clusters} to listener map");
 
             var observers = new ConcurrentList<Action<IEvent>>();
             observers.Add(listener);
@@ -91,7 +91,7 @@ namespace Sino.Nacos.Naming.Core
         /// </summary>
         public void RemoveListener(string serviceName, string clusters, Action<IEvent> listener)
         {
-            logger.Info($"[LISTENER] removing {serviceName} with {clusters} from listener key");
+            _logger.Info($"[LISTENER] removing {serviceName} with {clusters} from listener key");
 
             ConcurrentList<Action<IEvent>> observers = null;
             if (observerMap.TryGetValue(ServiceInfo.GetKey(serviceName, clusters), out observers))
