@@ -17,11 +17,13 @@ namespace Sino.Nacos.Common
         public const long DEFAULT_HEART_BEAT_INTERVAL = 5 * 60 * 1000;
         public const long DEFAULT_IP_DELETE_TIMEOUT = 30 * 60 * 1000;
         public const long DEFAULT_HEART_BEAT_TIMEOUT = 15 * 60 * 1000;
-        public const char SERVICE_INFO_SPLITER = '@';
+        public const string SERVICE_INFO_SPLITER = "@@";
 
         public const string VERSION = "Nacos-Java-Client:v1.1.3";
         public const int REQUEST_DOMAIN_RETRY_COUNT = 3;
 
         public const string NAMING_INSTANCE_ID_SPLITTER = "#";
+
+        public const string DEFAULT_CLUSTER_NAME = "DEFAULT";
     }
 }

@@ -27,7 +27,7 @@ namespace Sino.Nacos.Naming.Net
         public int Port { get; set; } = 8848;
 
         /// <summary>
-        /// 名命空间
+        /// 名命空间（失效）
         /// </summary>
         public string Namespace { get; set; }
 

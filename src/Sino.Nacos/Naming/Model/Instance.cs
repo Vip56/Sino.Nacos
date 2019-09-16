@@ -43,7 +43,7 @@ namespace Sino.Nacos.Naming.Model
         public bool Enable { get; set; } = true;
 
         /// <summary>
-        /// 实例是临时的
+        /// 实例是临时(决定是否需要进行心跳检测),默认开启
         /// </summary>
         public bool Ephemeral { get; set; } = true;
 

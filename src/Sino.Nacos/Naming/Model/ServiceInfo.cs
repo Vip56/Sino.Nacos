@@ -99,7 +99,7 @@ namespace Sino.Nacos.Naming.Model
         {
             ServiceInfo serviceInfo = new ServiceInfo();
             int maxSegCount = 3;
-            string[] segs = key.Split(Constants.SERVICE_INFO_SPLITER);
+            string[] segs = key.Split(new string[] { Constants.SERVICE_INFO_SPLITER }, StringSplitOptions.RemoveEmptyEntries);
             if (segs.Length == maxSegCount - 1)
             {
                 serviceInfo.GroupName = segs[0];
