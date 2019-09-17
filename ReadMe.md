@@ -43,7 +43,9 @@ public class PreservedMetadataKeys
     }
 ```
 
-## 问题和支持
+## 额外说明
+
+### 暂不支持功能
 通过改写的过程中考虑到其情况部分功能进行了适当的删减和阉割，但是为了保证和官方的其他SDK之间的数据保持一致，这部分完全参考官方SDK进行设计开发。
 其中主要有以下功能进行的删减或计划未来支持：    
 * 通过UDP协议刷新服务信息；
@@ -54,3 +56,13 @@ public class PreservedMetadataKeys
 1. 支持失败重试；
 2. 支持多级缓存，而非单纯依靠文件；
 3. 支持通过断路器实现智能灾备支持；
+
+### 依赖类库
+1. [mockhttp](https://github.com/richardszalay/mockhttp)：实现HttpClient模拟；
+2. [moq](https://github.com/moq/moq4)：实现基本接口服务Mock；
+3. [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)：Json序列化支持；
+4. [Nlog](https://github.com/NLog/NLog)：提供日志记录；
+5. [xunit](https://github.com/xunit/xunit)：单元测试框架；
+
+### 依赖版本
+只支持Asp.Net Core 2.1+项目
