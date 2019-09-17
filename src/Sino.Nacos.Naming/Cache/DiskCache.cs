@@ -1,13 +1,11 @@
 ﻿using Newtonsoft.Json;
 using NLog;
-using Sino.Nacos.Common;
 using Sino.Nacos.Naming.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Web;
-using Sino.Nacos.Utilities;
 
 namespace Sino.Nacos.Naming.Cache
 {
