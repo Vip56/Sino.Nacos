@@ -20,21 +20,34 @@ namespace Sino.Nacos.Naming.Net
     /// </summary>
     public class NamingProxy
     {
-        public const string SERVICE_NAME = "serviceName";
-        public const string CLUSTER_NAME = "clusterName";
-        public const string NAMESPACE_ID = "namespaceId";
-        public const string GROUP_NAME = "groupName";
+        public const string SERVICE_NAME_KEY = "serviceName";
+        public const string CLUSTER_NAME_KEY = "clusterName";
+        public const string NAMESPACE_ID_KEY = "namespaceId";
+        public const string GROUP_NAME_KEY = "groupName";
+        public const string SERVICE_IP_KEY = "ip";
+        public const string SERVICE_PORT_KEY = "port";
+        public const string SERVICE_WEIGHT_KEY = "weight";
+        public const string SERVICE_ENABLE_KEY = "enable";
+        public const string SERVICE_HEALTHY_KEY = "healthy";
+        public const string SERVICE_EPHEMERAL_KEY = "ephemeral";
+        public const string SERVICE_METADATA_KEY = "metadata";
+        public const string PROTECT_THRESHOLD_KEY = "protectThreshold";
+        public const string SELECTOR_KEY = "selector";
+        public const string CLUSTERS_KEY = "clusters";
+        public const string HEALTHY_ONLY = "healthyOnly";
+        public const string BEAT_KEY = "beat";
+        public const string PAGE_NO_KEY = "pageNo";
+        public const string PAGE_SIZE_KEY = "pageSize";
         public const int REQUEST_DOMAIN_RETRY_COUNT = 3;
-        public const string VERSION = "Nacos-Java-Client:v1.1.3";
+        public const string VERSION = "Nacos-CSharp-Client-v1.1.3";
+
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _namespace;
         private string _endpoint;
         private string _nacosDomain;
         private IList<string> _serverList;
-
         private NamingConfig _httpConfig;
-
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// 通过EndPoint获取到的Nacos服务器地址
@@ -60,7 +73,7 @@ namespace Sino.Nacos.Naming.Net
             Init(config);
         }
 
-        public void Init(NamingConfig config)
+        private void Init(NamingConfig config)
         {
             _namespace = config.Namespace;
             _endpoint = config.EndPoint;
@@ -125,24 +138,24 @@ namespace Sino.Nacos.Naming.Net
             }
         }
 
-        public async Task RegisterService(string serviceName, string groupName, Instance instance)
+        public async Task<string> RegisterService(string serviceName, string groupName, Instance instance)
         {
             _logger.Info($"[REGISTER-SERVICE] {_namespace} registering service {serviceName} with instance: {instance}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(SERVICE_NAME, serviceName);
-            paramValue.Add(GROUP_NAME, groupName);
-            paramValue.Add(CLUSTER_NAME, instance.ClusterName);
-            paramValue.Add("ip", instance.Ip);
-            paramValue.Add("port", instance.Port.ToString());
-            paramValue.Add("weight", instance.Weight.ToString());
-            paramValue.Add("enable", instance.Enable.ToString());
-            paramValue.Add("healthy", instance.Healthy.ToString());
-            paramValue.Add("ephemeral", instance.Ephemeral.ToString());
-            paramValue.Add("metadata", JsonConvert.SerializeObject(instance.Metadata));
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(SERVICE_NAME_KEY, serviceName);
+            paramValue.Add(GROUP_NAME_KEY, groupName);
+            paramValue.Add(CLUSTER_NAME_KEY, instance.ClusterName);
+            paramValue.Add(SERVICE_IP_KEY, instance.Ip);
+            paramValue.Add(SERVICE_PORT_KEY, instance.Port.ToString());
+            paramValue.Add(SERVICE_WEIGHT_KEY, instance.Weight.ToString());
+            paramValue.Add(SERVICE_ENABLE_KEY, instance.Enable.ToString());
+            paramValue.Add(SERVICE_HEALTHY_KEY, instance.Healthy.ToString());
+            paramValue.Add(SERVICE_EPHEMERAL_KEY, instance.Ephemeral.ToString());
+            paramValue.Add(SERVICE_METADATA_KEY, JsonConvert.SerializeObject(instance.Metadata));
 
-            await ReqApi<string>(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Post);
+            return await ReqApi(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Post);
         }
 
         public async Task DeregisterService(string serviceName, Instance instance)
@@ -150,14 +163,14 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[DEREGITER-SERVICE] {_namespace} deregistering service {serviceName} with instance: {instance}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(SERVICE_NAME, serviceName);
-            paramValue.Add(CLUSTER_NAME, instance.ClusterName);
-            paramValue.Add("ip", instance.Ip);
-            paramValue.Add("port", instance.Port.ToString());
-            paramValue.Add("ephemeral", instance.Ephemeral.ToString());
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(SERVICE_NAME_KEY, serviceName);
+            paramValue.Add(CLUSTER_NAME_KEY, instance.ClusterName);
+            paramValue.Add(SERVICE_IP_KEY, instance.Ip);
+            paramValue.Add(SERVICE_PORT_KEY, instance.Port.ToString());
+            paramValue.Add(SERVICE_EPHEMERAL_KEY, instance.Ephemeral.ToString());
 
-            await ReqApi<string>(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Delete);
+            await ReqApi(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Delete);
         }
 
         public async Task UpdateInstance(string serviceName, string groupName, Instance instance)
@@ -165,18 +178,18 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[UPDATE-SERVICE] {_namespace} update service {serviceName} with instance: {instance}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(SERVICE_NAME, serviceName);
-            paramValue.Add(GROUP_NAME, groupName);
-            paramValue.Add(CLUSTER_NAME, instance.ClusterName);
-            paramValue.Add("ip", instance.Ip);
-            paramValue.Add("port", instance.Port.ToString());
-            paramValue.Add("weight", instance.Weight.ToString());
-            paramValue.Add("enabled", instance.Enable.ToString());
-            paramValue.Add("ephemeral", instance.Ephemeral.ToString());
-            paramValue.Add("metadata", JsonConvert.SerializeObject(instance.Metadata));
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(SERVICE_NAME_KEY, serviceName);
+            paramValue.Add(GROUP_NAME_KEY, groupName);
+            paramValue.Add(CLUSTER_NAME_KEY, instance.ClusterName);
+            paramValue.Add(SERVICE_IP_KEY, instance.Ip);
+            paramValue.Add(SERVICE_PORT_KEY, instance.Port.ToString());
+            paramValue.Add(SERVICE_WEIGHT_KEY, instance.Weight.ToString());
+            paramValue.Add(SERVICE_ENABLE_KEY, instance.Enable.ToString());
+            paramValue.Add(SERVICE_EPHEMERAL_KEY, instance.Ephemeral.ToString());
+            paramValue.Add(SERVICE_METADATA_KEY, JsonConvert.SerializeObject(instance.Metadata));
 
-            await ReqApi<string>(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Put);
+            await ReqApi(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Put);
         }
 
         public async Task<Service> QueryService(string serviceName, string groupName)
@@ -184,11 +197,12 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[QUERY-SERVICE] {_namespace} query service: {serviceName}, {groupName}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(SERVICE_NAME, serviceName);
-            paramValue.Add(GROUP_NAME, groupName);
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(SERVICE_NAME_KEY, serviceName);
+            paramValue.Add(GROUP_NAME_KEY, groupName);
 
-            return await ReqApi<Service>(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Get);
+            var result = await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Get);
+            return JsonConvert.DeserializeObject<Service>(result);
         }
 
         public async Task CreateService(Service service, Selector selector)
@@ -196,14 +210,14 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[CREATE-SERVICE] {_namespace} create service: {service}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(SERVICE_NAME, service.Name);
-            paramValue.Add(GROUP_NAME, service.GroupName);
-            paramValue.Add("protectThreshold", service.ProtectThreshold.ToString());
-            paramValue.Add("metadata", JsonConvert.SerializeObject(service.Metadata));
-            paramValue.Add("selector", JsonConvert.SerializeObject(selector));
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(SERVICE_NAME_KEY, service.Name);
+            paramValue.Add(GROUP_NAME_KEY, service.GroupName);
+            paramValue.Add(PROTECT_THRESHOLD_KEY, service.ProtectThreshold.ToString());
+            paramValue.Add(SERVICE_METADATA_KEY, JsonConvert.SerializeObject(service.Metadata));
+            paramValue.Add(SELECTOR_KEY, JsonConvert.SerializeObject(selector));
 
-            await ReqApi<string>(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Post);
+            await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Post);
         }
 
         public async Task<bool> DeleteService(string serviceName, string groupName)
@@ -211,11 +225,11 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[DELETE-SERVICE] {_namespace} deleting service: {serviceName} with groupName: {groupName}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(SERVICE_NAME, serviceName);
-            paramValue.Add(GROUP_NAME, groupName);
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(SERVICE_NAME_KEY, serviceName);
+            paramValue.Add(GROUP_NAME_KEY, groupName);
 
-            string result = await ReqApi<string>(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Delete);
+            string result = await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Delete);
             return "ok".Equals(result);
         }
 
@@ -224,27 +238,25 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[UPDATE-SERVICE] {_namespace} updating service : {service}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(SERVICE_NAME, service.Name);
-            paramValue.Add(GROUP_NAME, service.GroupName);
-            paramValue.Add("protectThreshold", service.ProtectThreshold.ToString());
-            paramValue.Add("metadata", JsonConvert.SerializeObject(service.Metadata));
-            paramValue.Add("selector", JsonConvert.SerializeObject(selector));
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(SERVICE_NAME_KEY, service.Name);
+            paramValue.Add(GROUP_NAME_KEY, service.GroupName);
+            paramValue.Add(PROTECT_THRESHOLD_KEY, service.ProtectThreshold.ToString());
+            paramValue.Add(SERVICE_METADATA_KEY, JsonConvert.SerializeObject(service.Metadata));
+            paramValue.Add(SELECTOR_KEY, JsonConvert.SerializeObject(selector));
 
-            await ReqApi<string>(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Put);
+            await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Put);
         }
 
         public async Task<string> QueryList(string serviceName, string clusters, int udpPort, bool healthyOnly)
         {
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(SERVICE_NAME, serviceName);
-            paramValue.Add("clusters", clusters);
-            paramValue.Add("udpPort", udpPort.ToString());
-            paramValue.Add("clientIP", _httpConfig.Ip);
-            paramValue.Add("healthyOnly", healthyOnly.ToString());
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(SERVICE_NAME_KEY, serviceName);
+            paramValue.Add(CLUSTERS_KEY, clusters);
+            paramValue.Add(HEALTHY_ONLY, healthyOnly.ToString());
 
-            return await ReqApi<string>(UtilAndComs.NACOS_URL_BASE + "/instance/list", paramValue, HttpMethod.Get);
+            return await ReqApi(UtilAndComs.NACOS_URL_BASE + "/instance/list", paramValue, HttpMethod.Get);
         }
 
         public async Task<long> SendBeat(BeatInfo beatInfo)
@@ -254,10 +266,10 @@ namespace Sino.Nacos.Naming.Net
                 _logger.Debug($"[BEAT] {_namespace} sending beat to server: {beatInfo}");
 
                 Dictionary<string, string> paramValue = new Dictionary<string, string>();
-                paramValue.Add("beat", beatInfo.ToString());
-                paramValue.Add(NAMESPACE_ID, _namespace);
-                paramValue.Add(SERVICE_NAME, beatInfo.ServiceName);
-                string result = await ReqApi<string>(UtilAndComs.NACOS_URL_BASE + "/instance/beat", paramValue, HttpMethod.Put);
+                paramValue.Add(BEAT_KEY, beatInfo.ToString());
+                paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+                paramValue.Add(SERVICE_NAME_KEY, beatInfo.ServiceName);
+                string result = await ReqApi(UtilAndComs.NACOS_URL_BASE + "/instance/beat", paramValue, HttpMethod.Put);
 
                 // 这里还需要从结果的Json中获取clientBeatInterval的值返回，但是实际openApi文档中只返回OK
             }
@@ -272,10 +284,11 @@ namespace Sino.Nacos.Naming.Net
         {
             try
             {
-                ServiceMetrics metrics = await ReqApi<ServiceMetrics>(UtilAndComs.NACOS_URL_BASE + "/operator/metrics", new Dictionary<string, string>(), HttpMethod.Get);
+                var result = await ReqApi(UtilAndComs.NACOS_URL_BASE + "/operator/metrics", new Dictionary<string, string>(), HttpMethod.Get);
+                ServiceMetrics metrics = JsonConvert.DeserializeObject<ServiceMetrics>(result);
                 return "UP".Equals(metrics.Status);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return false;
             }
@@ -284,14 +297,16 @@ namespace Sino.Nacos.Naming.Net
         public async Task<ServiceList> GetServiceList(int pageNo, int pageSize, string groupName, Selector selector)
         {
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add("pageNo", pageNo.ToString());
-            paramValue.Add("pageSize", pageSize.ToString());
-            paramValue.Add(NAMESPACE_ID, _namespace);
-            paramValue.Add(GROUP_NAME, groupName);
+            paramValue.Add(PAGE_NO_KEY, pageNo.ToString());
+            paramValue.Add(PAGE_SIZE_KEY, pageSize.ToString());
+            paramValue.Add(NAMESPACE_ID_KEY, _namespace);
+            paramValue.Add(GROUP_NAME_KEY, groupName);
 
             //selector暂时不实现
 
-            return await ReqApi<ServiceList>(UtilAndComs.NACOS_URL_BASE + "/service/list", paramValue, HttpMethod.Get);
+            var result = await ReqApi(UtilAndComs.NACOS_URL_BASE + "/service/list", paramValue, HttpMethod.Get);
+
+            return JsonConvert.DeserializeObject<ServiceList>(result);
         }
 
         public async Task<IList<string>> GetServerListFromEndpoint()
@@ -325,7 +340,7 @@ namespace Sino.Nacos.Naming.Net
             return null;
         }
 
-        public async Task<T> CallServer<T>(string api, Dictionary<string, string> param, string curServer, HttpMethod method)
+        private async Task<string> CallServer(string api, Dictionary<string, string> param, string curServer, HttpMethod method)
         {
             long start = DateTime.Now.GetTimeStamp();
             long end = 0;
@@ -333,26 +348,15 @@ namespace Sino.Nacos.Naming.Net
             CheckSignature(param);
             var headers = BuilderHeaders();
 
-            string url;
-            if (curServer.StartsWith("https://") || curServer.StartsWith("http://"))
-            {
-                url = curServer + api;
-            }
-            else
-            {
-                if (!curServer.Contains(':'))
-                {
-                    curServer = curServer + ":" + _httpConfig.Port;
-                }
-                url = "http://" + curServer + api;
-            }
+            string url = curServer + api;
 
             var result = await _http.Request(url, headers, param, Encoding.UTF8, method);
             end = DateTime.Now.GetTimeStamp();
-            return JsonConvert.DeserializeObject<T>(result);
+
+            return result;
         }
 
-        public Task<T> ReqApi<T>(string api, Dictionary<string, string> paramValue, HttpMethod httpMethod)
+        private Task<string> ReqApi(string api, Dictionary<string, string> paramValue, HttpMethod httpMethod)
         {
             var snapshot = _serversFromEndpoint;
             if (_serverList != null && _serverList.Count > 0)
@@ -360,13 +364,11 @@ namespace Sino.Nacos.Naming.Net
                 snapshot = _serverList;
             }
 
-            return ReqApi<T>(api, paramValue, snapshot, httpMethod);
+            return ReqApi(api, paramValue, snapshot, httpMethod);
         }
 
-        public Task<T> ReqApi<T>(string api, Dictionary<string, string> param, IList<string> servers, HttpMethod method)
+        private Task<string> ReqApi(string api, Dictionary<string, string> param, IList<string> servers, HttpMethod method)
         {
-            param.Add(NAMESPACE_ID, _namespace);
-
             if (servers?.Count <= 0 && string.IsNullOrEmpty(_nacosDomain))
             {
                 throw new ArgumentNullException("no server available");
@@ -384,7 +386,7 @@ namespace Sino.Nacos.Naming.Net
                     string server = servers[index];
                     try
                     {
-                        return CallServer<T>(api, param, server, method);
+                        return CallServer(api, param, server, method);
                     }
                     catch(NacosException ex)
                     {
@@ -404,7 +406,7 @@ namespace Sino.Nacos.Naming.Net
             {
                 try
                 {
-                    return CallServer<T>(api, param, _nacosDomain, HttpMethod.Get);
+                    return CallServer(api, param, _nacosDomain, HttpMethod.Get);
                 }
                 catch(Exception ex)
                 {
@@ -424,7 +426,7 @@ namespace Sino.Nacos.Naming.Net
                 return;
             }
 
-            string signData = string.IsNullOrEmpty(_httpConfig.ServiceName) ? DateTime.Now.GetTimeStamp() + "@@" + _httpConfig.ServiceName : DateTime.Now.GetTimeStamp().ToString();
+            string signData = string.IsNullOrEmpty(param[SERVICE_NAME_KEY]) ? DateTime.Now.GetTimeStamp() + "@@" + param[SERVICE_NAME_KEY] : DateTime.Now.GetTimeStamp().ToString();
             string signature = Sign(signData, _httpConfig.SecretKey);
             param.Add("signature", signature);
             param.Add("data", signData);

@@ -21,11 +21,6 @@ namespace Sino.Nacos.Naming
         public IList<string> ServerAddr { get; set; }
 
         /// <summary>
-        /// 服务名称
-        /// </summary>
-        public string ServiceName { get; set; }
-
-        /// <summary>
         /// 提供Nacos服务地址的地址（暂不支持规则形式）
         /// </summary>
         public string EndPoint { get; set; }
@@ -46,11 +41,6 @@ namespace Sino.Nacos.Naming
         public int ConnectionTimeout { get; set; } = 3000;
 
         /// <summary>
-        /// 服务端口
-        /// </summary>
-        public int Port { get; set; } = 8848;
-
-        /// <summary>
         /// 公钥
         /// </summary>
         public string AccessKey { get; set; }
@@ -59,10 +49,5 @@ namespace Sino.Nacos.Naming
         /// 私钥
         /// </summary>
         public string SecretKey { get; set; }
-
-        /// <summary>
-        /// ip地址
-        /// </summary>
-        public string Ip { get; set; }
     }
 }

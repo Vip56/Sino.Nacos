@@ -32,7 +32,6 @@ namespace Sino.Nacos.Naming.Net
 
             HttpRequestMessage requestMessage = new HttpRequestMessage();
             requestMessage.Method = method;
-            requestMessage.Headers.Connection.Add("Keep-Alive");
             if (paramValues == null || paramValues.Count <= 0)
             {
                 requestMessage.RequestUri = new Uri(url);
@@ -51,10 +50,10 @@ namespace Sino.Nacos.Naming.Net
             
 
             // 根据实际调试情况可决定是否需要，主要防止post和put无body出错
-            if (method == HttpMethod.Post || method == HttpMethod.Put)
-            {
-                requestMessage.Content = new FormUrlEncodedContent(paramValues);
-            }
+            //if (method == HttpMethod.Post || method == HttpMethod.Put)
+            //{
+            //    requestMessage.Content = new FormUrlEncodedContent(paramValues);
+            //}
 
             try
             {
@@ -83,7 +82,7 @@ namespace Sino.Nacos.Naming.Net
         {
             if (newHeaders != null)
             {
-                foreach(var header in headers)
+                foreach(var header in newHeaders)
                 {
                     headers.Add(header.Key, header.Value);
                 }
