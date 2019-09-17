@@ -1,5 +1,4 @@
-﻿using Sino.Nacos.Common;
-using Sino.Nacos.Naming.Beat;
+﻿using Sino.Nacos.Naming.Beat;
 using Sino.Nacos.Naming.Core;
 using Sino.Nacos.Naming.Listener;
 using Sino.Nacos.Naming.Model;
@@ -7,7 +6,6 @@ using Sino.Nacos.Naming.Net;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Sino.Nacos.Naming

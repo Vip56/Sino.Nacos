@@ -1,8 +1,6 @@
-﻿using Sino.Nacos.Common;
+﻿using Sino.Nacos.Naming.Utils;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Sino.Nacos.Utilities;
 using System.Web;
 
 namespace Sino.Nacos.Naming.Model

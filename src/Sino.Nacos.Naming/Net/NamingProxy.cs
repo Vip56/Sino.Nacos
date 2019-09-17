@@ -5,14 +5,13 @@ using System.Linq;
 using System.Threading;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Sino.Nacos.Utilities;
 using System.Security.Cryptography;
-using Sino.Nacos.Common;
-using Sino.Nacos.Exceptions;
 using NLog;
 using Newtonsoft.Json;
 using System.IO;
 using Sino.Nacos.Naming.Model;
+using Sino.Nacos.Naming.Utils;
+using Sino.Nacos.Naming.Exceptions;
 
 namespace Sino.Nacos.Naming.Net
 {

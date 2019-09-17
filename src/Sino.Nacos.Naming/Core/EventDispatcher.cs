@@ -1,7 +1,7 @@
 ﻿using NLog;
 using Sino.Nacos.Naming.Listener;
 using Sino.Nacos.Naming.Model;
-using Sino.Nacos.Utilities;
+using Sino.Nacos.Naming.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -83,7 +83,6 @@ namespace Sino.Nacos.Naming.Core
             {
                 observers.Add(listener);
             }
-
         }
 
         /// <summary>

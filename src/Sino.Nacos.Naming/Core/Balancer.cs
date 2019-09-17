@@ -24,6 +24,9 @@ namespace Sino.Nacos.Naming.Core
             return serviceInfo.Hosts;
         }
 
+        /// <summary>
+        /// 根据权重获取
+        /// </summary>
         public static Instance SelectHost(ServiceInfo serviceInfo)
         {
             var hosts = SelectAll(serviceInfo);

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using Sino.Nacos.Naming.Model;
+using Sino.Nacos.Naming.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,9 @@ using System.Web;
 
 namespace Sino.Nacos.Naming.Cache
 {
+    /// <summary>
+    /// 磁盘缓存工具
+    /// </summary>
     public class DiskCache
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
