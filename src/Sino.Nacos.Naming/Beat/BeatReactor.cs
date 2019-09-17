@@ -17,6 +17,8 @@ namespace Sino.Nacos.Naming.Beat
     /// </remarks>
     public class BeatReactor
     {
+        public const string NAMING_INSTANCE_ID_SPLITTER = "#";
+
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private NamingProxy _serverProxy;
@@ -81,7 +83,7 @@ namespace Sino.Nacos.Naming.Beat
 
         private string BuildKey(string serviceName, string ip, int port)
         {
-            return serviceName + Constants.NAMING_INSTANCE_ID_SPLITTER + ip + Constants.NAMING_INSTANCE_ID_SPLITTER + port.ToString();
+            return serviceName + NAMING_INSTANCE_ID_SPLITTER + ip + NAMING_INSTANCE_ID_SPLITTER + port.ToString();
         }
     }
 }

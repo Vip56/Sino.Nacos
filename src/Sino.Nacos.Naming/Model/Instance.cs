@@ -6,6 +6,10 @@ namespace Sino.Nacos.Naming.Model
     /// <summary>
     /// 实例
     /// </summary>
+    /// <remarks>
+    /// 通过Metadata可以设定关于实例的其他系统参数，具体参数可以参考
+    /// <see cref="PreservedMetadataKeys"/>
+    /// </remarks>
     public class Instance
     {
         /// <summary>

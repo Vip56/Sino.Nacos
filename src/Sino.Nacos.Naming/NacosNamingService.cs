@@ -16,6 +16,8 @@ namespace Sino.Nacos.Naming
     public class NacosNamingService : INamingService
     {
         public const int DEFAULT_HEART_BEAT_INTERVAL = 5 * 1000;
+        public const string DEFAULT_GROUP = "DEFAULT_GROUP";
+        public const string DEFAULT_CLUSTER_NAME = "DEFAULT";
 
         private HostReactor _hostReactor;
         private BeatReactor _beatReactor;
@@ -45,17 +47,17 @@ namespace Sino.Nacos.Naming
 
         public async Task DeregisterInstance(string serviceName, string ip, int port)
         {
-            await DeregisterInstance(serviceName, ip, port, Constants.DEFAULT_CLUSTER_NAME);
+            await DeregisterInstance(serviceName, ip, port, DEFAULT_CLUSTER_NAME);
         }
 
         public async Task DeregisterInstance(string serviceName, string groupName, string ip, int port)
         {
-            await DeregisterInstance(serviceName, groupName, ip, port, Constants.DEFAULT_CLUSTER_NAME);
+            await DeregisterInstance(serviceName, groupName, ip, port, DEFAULT_CLUSTER_NAME);
         }
 
         public async Task DeregisterInstance(string serviceName, string ip, int port, string clusterName)
         {
-            await DeregisterInstance(serviceName, Constants.DEFAULT_GROUP, ip, port, clusterName);
+            await DeregisterInstance(serviceName, DEFAULT_GROUP, ip, port, clusterName);
         }
 
         public async Task DeregisterInstance(string serviceName, string groupName, string ip, int port, string clusterName)
@@ -70,7 +72,7 @@ namespace Sino.Nacos.Naming
 
         public async Task DeregisterInstance(string serviceName, Instance instance)
         {
-            await DeregisterInstance(serviceName, Constants.DEFAULT_GROUP, instance);
+            await DeregisterInstance(serviceName, DEFAULT_GROUP, instance);
         }
 
         public async Task DeregisterInstance(string serviceName, string groupName, Instance instance)
@@ -114,7 +116,7 @@ namespace Sino.Nacos.Naming
 
         public Task<IList<Instance>> GetAllInstances(string serviceName, IList<string> clusters, bool subscribe)
         {
-            return GetAllInstances(serviceName, Constants.DEFAULT_GROUP, clusters, subscribe);
+            return GetAllInstances(serviceName, DEFAULT_GROUP, clusters, subscribe);
         }
 
         public async Task<IList<Instance>> GetAllInstances(string serviceName, string groupName, IList<string> clusters, bool subscribe)
@@ -142,7 +144,7 @@ namespace Sino.Nacos.Naming
 
         public Task<ServiceList> GetServicesOfServer(int pageNo, int pageSize)
         {
-            return GetServicesOfServer(pageNo, pageSize, Constants.DEFAULT_GROUP);
+            return GetServicesOfServer(pageNo, pageSize, DEFAULT_GROUP);
         }
 
         public Task<ServiceList> GetServicesOfServer(int pageNo, int pageSize, string groupName)
@@ -162,17 +164,17 @@ namespace Sino.Nacos.Naming
 
         public async Task RegisterInstance(string serviceName, string ip, int port)
         {
-            await RegisterInstance(serviceName, ip, port, Constants.DEFAULT_CLUSTER_NAME);
+            await RegisterInstance(serviceName, ip, port, DEFAULT_CLUSTER_NAME);
         }
 
         public async Task RegisterInstance(string serviceName, string groupName, string ip, int port)
         {
-            await RegisterInstance(serviceName, groupName, ip, port, Constants.DEFAULT_CLUSTER_NAME);
+            await RegisterInstance(serviceName, groupName, ip, port, DEFAULT_CLUSTER_NAME);
         }
 
         public async Task RegisterInstance(string serviceName, string ip, int port, string clusterName)
         {
-            await RegisterInstance(serviceName, Constants.DEFAULT_GROUP, ip, port, clusterName);
+            await RegisterInstance(serviceName, DEFAULT_GROUP, ip, port, clusterName);
         }
 
         public async Task RegisterInstance(string serviceName, string groupName, string ip, int port, string clusterName)
@@ -188,7 +190,7 @@ namespace Sino.Nacos.Naming
 
         public async Task RegisterInstance(string serviceName, Instance instance)
         {
-            await RegisterInstance(serviceName, Constants.DEFAULT_GROUP, instance);
+            await RegisterInstance(serviceName, DEFAULT_GROUP, instance);
         }
 
         public async Task RegisterInstance(string serviceName, string groupName, Instance instance)
@@ -243,7 +245,7 @@ namespace Sino.Nacos.Naming
 
         public Task<IList<Instance>> SelectInstances(string serviceName, IList<string> clusters, bool healthy, bool subscribe)
         {
-            return SelectInstances(serviceName, Constants.DEFAULT_GROUP, clusters, healthy, subscribe);
+            return SelectInstances(serviceName, DEFAULT_GROUP, clusters, healthy, subscribe);
         }
 
         public async Task<IList<Instance>> SelectInstances(string serviceName, string groupName, IList<string> clusters, bool healthy, bool subscribe)
@@ -304,7 +306,7 @@ namespace Sino.Nacos.Naming
 
         public Task<Instance> SelectOneHealthyInstance(string serviceName, IList<string> clusters, bool subscribe)
         {
-            return SelectOneHealthyInstance(serviceName, Constants.DEFAULT_GROUP, clusters, subscribe);
+            return SelectOneHealthyInstance(serviceName, DEFAULT_GROUP, clusters, subscribe);
         }
 
         public async Task<Instance> SelectOneHealthyInstance(string serviceName, string groupName, IList<string> clusters, bool subscribe)
@@ -331,7 +333,7 @@ namespace Sino.Nacos.Naming
 
         public async Task Subscribe(string serviceName, IList<string> clusters, Action<IEvent> listener)
         {
-            await Subscribe(serviceName, Constants.DEFAULT_GROUP, clusters, listener);
+            await Subscribe(serviceName, DEFAULT_GROUP, clusters, listener);
         }
 
         public async Task Subscribe(string serviceName, string groupName, IList<string> clusters, Action<IEvent> listener)
@@ -351,7 +353,7 @@ namespace Sino.Nacos.Naming
 
         public void Unsubscribe(string serviceName, IList<string> clusters, Action<IEvent> listener)
         {
-            Unsubscribe(serviceName, Constants.DEFAULT_GROUP, clusters, listener);
+            Unsubscribe(serviceName, DEFAULT_GROUP, clusters, listener);
         }
 
         public void Unsubscribe(string serviceName, string groupName, IList<string> clusters, Action<IEvent> listener)

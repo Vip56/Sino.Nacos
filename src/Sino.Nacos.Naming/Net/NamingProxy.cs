@@ -20,6 +20,13 @@ namespace Sino.Nacos.Naming.Net
     /// </summary>
     public class NamingProxy
     {
+        public const string SERVICE_NAME = "serviceName";
+        public const string CLUSTER_NAME = "clusterName";
+        public const string NAMESPACE_ID = "namespaceId";
+        public const string GROUP_NAME = "groupName";
+        public const int REQUEST_DOMAIN_RETRY_COUNT = 3;
+        public const string VERSION = "Nacos-Java-Client:v1.1.3";
+
         private string _namespace;
         private string _endpoint;
         private string _nacosDomain;
@@ -123,10 +130,10 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[REGISTER-SERVICE] {_namespace} registering service {serviceName} with instance: {instance}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.SERVICE_NAME, serviceName);
-            paramValue.Add(CommonParams.GROUP_NAME, groupName);
-            paramValue.Add(CommonParams.CLUSTER_NAME, instance.ClusterName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(SERVICE_NAME, serviceName);
+            paramValue.Add(GROUP_NAME, groupName);
+            paramValue.Add(CLUSTER_NAME, instance.ClusterName);
             paramValue.Add("ip", instance.Ip);
             paramValue.Add("port", instance.Port.ToString());
             paramValue.Add("weight", instance.Weight.ToString());
@@ -143,9 +150,9 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[DEREGITER-SERVICE] {_namespace} deregistering service {serviceName} with instance: {instance}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.SERVICE_NAME, serviceName);
-            paramValue.Add(CommonParams.CLUSTER_NAME, instance.ClusterName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(SERVICE_NAME, serviceName);
+            paramValue.Add(CLUSTER_NAME, instance.ClusterName);
             paramValue.Add("ip", instance.Ip);
             paramValue.Add("port", instance.Port.ToString());
             paramValue.Add("ephemeral", instance.Ephemeral.ToString());
@@ -158,10 +165,10 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[UPDATE-SERVICE] {_namespace} update service {serviceName} with instance: {instance}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.SERVICE_NAME, serviceName);
-            paramValue.Add(CommonParams.GROUP_NAME, groupName);
-            paramValue.Add(CommonParams.CLUSTER_NAME, instance.ClusterName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(SERVICE_NAME, serviceName);
+            paramValue.Add(GROUP_NAME, groupName);
+            paramValue.Add(CLUSTER_NAME, instance.ClusterName);
             paramValue.Add("ip", instance.Ip);
             paramValue.Add("port", instance.Port.ToString());
             paramValue.Add("weight", instance.Weight.ToString());
@@ -177,9 +184,9 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[QUERY-SERVICE] {_namespace} query service: {serviceName}, {groupName}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.SERVICE_NAME, serviceName);
-            paramValue.Add(CommonParams.GROUP_NAME, groupName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(SERVICE_NAME, serviceName);
+            paramValue.Add(GROUP_NAME, groupName);
 
             return await ReqApi<Service>(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Get);
         }
@@ -189,9 +196,9 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[CREATE-SERVICE] {_namespace} create service: {service}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.SERVICE_NAME, service.Name);
-            paramValue.Add(CommonParams.GROUP_NAME, service.GroupName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(SERVICE_NAME, service.Name);
+            paramValue.Add(GROUP_NAME, service.GroupName);
             paramValue.Add("protectThreshold", service.ProtectThreshold.ToString());
             paramValue.Add("metadata", JsonConvert.SerializeObject(service.Metadata));
             paramValue.Add("selector", JsonConvert.SerializeObject(selector));
@@ -204,9 +211,9 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[DELETE-SERVICE] {_namespace} deleting service: {serviceName} with groupName: {groupName}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.SERVICE_NAME, serviceName);
-            paramValue.Add(CommonParams.GROUP_NAME, groupName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(SERVICE_NAME, serviceName);
+            paramValue.Add(GROUP_NAME, groupName);
 
             string result = await ReqApi<string>(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Delete);
             return "ok".Equals(result);
@@ -217,9 +224,9 @@ namespace Sino.Nacos.Naming.Net
             _logger.Info($"[UPDATE-SERVICE] {_namespace} updating service : {service}");
 
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.SERVICE_NAME, service.Name);
-            paramValue.Add(CommonParams.GROUP_NAME, service.GroupName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(SERVICE_NAME, service.Name);
+            paramValue.Add(GROUP_NAME, service.GroupName);
             paramValue.Add("protectThreshold", service.ProtectThreshold.ToString());
             paramValue.Add("metadata", JsonConvert.SerializeObject(service.Metadata));
             paramValue.Add("selector", JsonConvert.SerializeObject(selector));
@@ -230,8 +237,8 @@ namespace Sino.Nacos.Naming.Net
         public async Task<string> QueryList(string serviceName, string clusters, int udpPort, bool healthyOnly)
         {
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.SERVICE_NAME, serviceName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(SERVICE_NAME, serviceName);
             paramValue.Add("clusters", clusters);
             paramValue.Add("udpPort", udpPort.ToString());
             paramValue.Add("clientIP", _httpConfig.Ip);
@@ -248,8 +255,8 @@ namespace Sino.Nacos.Naming.Net
 
                 Dictionary<string, string> paramValue = new Dictionary<string, string>();
                 paramValue.Add("beat", beatInfo.ToString());
-                paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-                paramValue.Add(CommonParams.SERVICE_NAME, beatInfo.ServiceName);
+                paramValue.Add(NAMESPACE_ID, _namespace);
+                paramValue.Add(SERVICE_NAME, beatInfo.ServiceName);
                 string result = await ReqApi<string>(UtilAndComs.NACOS_URL_BASE + "/instance/beat", paramValue, HttpMethod.Put);
 
                 // 这里还需要从结果的Json中获取clientBeatInterval的值返回，但是实际openApi文档中只返回OK
@@ -279,8 +286,8 @@ namespace Sino.Nacos.Naming.Net
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
             paramValue.Add("pageNo", pageNo.ToString());
             paramValue.Add("pageSize", pageSize.ToString());
-            paramValue.Add(CommonParams.NAMESPACE_ID, _namespace);
-            paramValue.Add(CommonParams.GROUP_NAME, groupName);
+            paramValue.Add(NAMESPACE_ID, _namespace);
+            paramValue.Add(GROUP_NAME, groupName);
 
             //selector暂时不实现
 
@@ -358,7 +365,7 @@ namespace Sino.Nacos.Naming.Net
 
         public Task<T> ReqApi<T>(string api, Dictionary<string, string> param, IList<string> servers, HttpMethod method)
         {
-            param.Add(CommonParams.NAMESPACE_ID, _namespace);
+            param.Add(NAMESPACE_ID, _namespace);
 
             if (servers?.Count <= 0 && string.IsNullOrEmpty(_nacosDomain))
             {
@@ -393,7 +400,7 @@ namespace Sino.Nacos.Naming.Net
                 throw new InvalidOperationException($"failed to req API:{api} after all servers {servers} tried: {exception.Message}");
             }
 
-            for (int i = 0; i < Constants.REQUEST_DOMAIN_RETRY_COUNT; i++)
+            for (int i = 0; i < REQUEST_DOMAIN_RETRY_COUNT; i++)
             {
                 try
                 {
@@ -437,8 +444,8 @@ namespace Sino.Nacos.Naming.Net
         private Dictionary<string, string> BuilderHeaders()
         {
             var headers = new Dictionary<string, string>();
-            headers.Add("Client-Version", Constants.VERSION);
-            headers.Add("User-Agent", Constants.VERSION);
+            headers.Add("Client-Version", VERSION);
+            headers.Add("User-Agent", VERSION);
             headers.Add("RequestId", Guid.NewGuid().ToString());
             headers.Add("Request-Module", "Naming");
 

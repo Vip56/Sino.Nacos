@@ -12,6 +12,36 @@
 考虑到实际使用该SDK的场景中可能会出现相同程序同时注册不同的服务名称或注册不同服务名称且出口IP和端口不一样的情况，所以该SDK实现了基于
 服务名称+IP+Port级别的服务心跳以保证Nacos注册中心不会将我们注册的服务置为不健康状态，但是这也意味着注册过多将会导致一定的CPU的消耗。    
 
+### 实例个性化
+当使用该SDK进行服务注册操作，除了基本的参数外，通过设定实例的具体参数可以额外控制一些其他属性，只有通过`Instance.MetaData`才可以，主要
+支持的属性如下：
+```
+/// <summary>
+/// 提供实例附加数据
+/// </summary>
+public class PreservedMetadataKeys
+{
+    /// <summary>
+    /// 注册来源
+    /// </summary>
+    public const string REGISTER_SOURCE = "preserved.register.source";
+
+    /// <summary>
+    /// 心跳超时时间
+    /// </summary>
+    public const string HEART_BEAT_TIMEOUT = "preserved.heart.beat.timeout";
+
+    /// <summary>
+    /// 实例移除超时时间
+    /// </summary>
+    public const string IP_DELETE_TIMEOUT = "preserved.ip.delete.timeout";
+
+    /// <summary>
+    /// 心跳间隔时间
+    /// </summary>
+    public const string HEART_BEAT_INTERVAL = "preserved.heart.beat.interval";
+    }
+```
 
 ## 问题和支持
 通过改写的过程中考虑到其情况部分功能进行了适当的删减和阉割，但是为了保证和官方的其他SDK之间的数据保持一致，这部分完全参考官方SDK进行设计开发。
