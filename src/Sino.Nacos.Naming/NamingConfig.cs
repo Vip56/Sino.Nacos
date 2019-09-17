@@ -10,8 +10,6 @@ namespace Sino.Nacos.Naming
     /// </summary>
     public class NamingConfig
     {
-        public HttpConfig HttpConfig { get; set; }
-
         /// <summary>
         /// 命名空间
         /// </summary>
@@ -21,7 +19,12 @@ namespace Sino.Nacos.Naming
         /// 服务地址列表
         /// </summary>
         public IList<string> ServerAddr { get; set; }
-        
+
+        /// <summary>
+        /// 服务名称
+        /// </summary>
+        public string ServiceName { get; set; }
+
         /// <summary>
         /// 提供Nacos服务地址的地址（暂不支持规则形式）
         /// </summary>
@@ -36,5 +39,30 @@ namespace Sino.Nacos.Naming
         /// 重启后从缓存恢复，默认关闭
         /// </summary>
         public bool LoadCacheAtStart { get; set; } = false;
+
+        /// <summary>
+        /// 连接超时时间，默认3000毫秒
+        /// </summary>
+        public int ConnectionTimeout { get; set; } = 3000;
+
+        /// <summary>
+        /// 服务端口
+        /// </summary>
+        public int Port { get; set; } = 8848;
+
+        /// <summary>
+        /// 公钥
+        /// </summary>
+        public string AccessKey { get; set; }
+
+        /// <summary>
+        /// 私钥
+        /// </summary>
+        public string SecretKey { get; set; }
+
+        /// <summary>
+        /// ip地址
+        /// </summary>
+        public string Ip { get; set; }
     }
 }

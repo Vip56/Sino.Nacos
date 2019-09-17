@@ -10,22 +10,25 @@ using System.Web;
 
 namespace Sino.Nacos.Naming.Net
 {
+    /// <summary>
+    /// 提供Http请求支持
+    /// </summary>
     public class FastHttp
     {
         private IHttpClientFactory _httpClientFactory;
-        private HttpConfig _httpConfig;
+        private NamingConfig _config;
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public FastHttp(IHttpClientFactory httpClientFactory, HttpConfig config)
+        public FastHttp(IHttpClientFactory httpClientFactory, NamingConfig config)
         {
-            this._httpClientFactory = httpClientFactory;
-            this._httpConfig = config;
+            _httpClientFactory = httpClientFactory;
+            _config = config;
         }
 
         public async Task<string> Request(string url, Dictionary<string, string> headers, Dictionary<string, string> paramValues, Encoding encoding, HttpMethod method)
         {
             var client = _httpClientFactory.CreateClient();
-            client.Timeout = TimeSpan.FromMilliseconds(_httpConfig.ConnectionTimeout);
+            client.Timeout = TimeSpan.FromMilliseconds(_config.ConnectionTimeout);
 
             HttpRequestMessage requestMessage = new HttpRequestMessage();
             requestMessage.Method = method;

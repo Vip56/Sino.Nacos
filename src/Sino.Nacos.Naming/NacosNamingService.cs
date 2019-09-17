@@ -30,7 +30,7 @@ namespace Sino.Nacos.Naming
             _config = config;
 
             _eventDispatcher = new EventDispatcher();
-            _namingProxy = new NamingProxy(config.HttpConfig, new FastHttp(httpClientFactory, config.HttpConfig));
+            _namingProxy = new NamingProxy(config, new FastHttp(httpClientFactory, config));
             _beatReactor = new BeatReactor(_namingProxy);
             _hostReactor = new HostReactor(_eventDispatcher, _namingProxy, config.CacheDir, config.LoadCacheAtStart);
         }

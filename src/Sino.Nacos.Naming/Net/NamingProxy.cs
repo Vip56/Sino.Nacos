@@ -32,7 +32,7 @@ namespace Sino.Nacos.Naming.Net
         private string _nacosDomain;
         private IList<string> _serverList;
 
-        private HttpConfig _httpConfig;
+        private NamingConfig _httpConfig;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -53,18 +53,18 @@ namespace Sino.Nacos.Naming.Net
 
         private FastHttp _http;
 
-        public NamingProxy(HttpConfig config, FastHttp http)
+        public NamingProxy(NamingConfig config, FastHttp http)
         {
             _httpConfig = config;
             _http = http;
             Init(config);
         }
 
-        public void Init(HttpConfig config)
+        public void Init(NamingConfig config)
         {
             _namespace = config.Namespace;
             _endpoint = config.EndPoint;
-            _serverList = config.ServerList;
+            _serverList = config.ServerAddr;
             if (_serverList != null || _serverList.Count == 1)
             {
                 _nacosDomain = _serverList.First();
