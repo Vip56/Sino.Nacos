@@ -1,42 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Sino.Nacos.Exceptions
+namespace Sino.Nacos.Naming.Exceptions
 {
     /// <summary>
     /// 异常
     /// </summary>
     public class NacosException : Exception
     {
-        public int ErrCode { get; set; }
-        public string ErrMsg { get; set; }
+        public int ErrorCode { get; set; }
+        public string ErrorMsg { get; set; }
 
         public NacosException() { }
 
         public NacosException(int errCode, string errMsg)
             :base(errMsg)
         {
-            ErrCode = errCode;
-            ErrMsg = errMsg;
+            ErrorCode = errCode;
+            ErrorMsg = errMsg;
         }
 
         public NacosException(int errCode, Exception ex)
             :base("", ex)
         {
-            ErrCode = errCode;
+            ErrorCode = errCode;
         }
 
         public NacosException(int errCode, string errMsg, Exception ex)
             :base(errMsg, ex)
         {
-            ErrCode = errCode;
-            ErrMsg = errMsg;
+            ErrorCode = errCode;
+            ErrorMsg = errMsg;
         }
 
         public override string ToString()
         {
-            return $"ErrCode:{ErrCode},ErrMsg:{ErrMsg}";
+            return $"ErrCode:{ErrorCode},ErrMsg:{ErrorMsg}";
         }
     }
 }

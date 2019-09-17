@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading;
 
-namespace Sino.Nacos.Utilities
+namespace Sino.Nacos.Naming.Utils
 {
     public class ConcurrentList<T> : IList<T>
     {

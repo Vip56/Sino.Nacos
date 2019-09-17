@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".global", ".global", "{350A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{296B3395-F271-445E-B2CD-185DDBD54BE0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sino.Nacos", "src\Sino.Nacos\Sino.Nacos.csproj", "{CF78D95A-31E4-4005-8865-204A5FB90351}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sino.Nacos.Naming", "src\Sino.Nacos.Naming\Sino.Nacos.Naming.csproj", "{74EA9C3E-9B06-4C42-98F9-8B17E9AEE8F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,16 +20,16 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CF78D95A-31E4-4005-8865-204A5FB90351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF78D95A-31E4-4005-8865-204A5FB90351}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF78D95A-31E4-4005-8865-204A5FB90351}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF78D95A-31E4-4005-8865-204A5FB90351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74EA9C3E-9B06-4C42-98F9-8B17E9AEE8F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74EA9C3E-9B06-4C42-98F9-8B17E9AEE8F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74EA9C3E-9B06-4C42-98F9-8B17E9AEE8F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74EA9C3E-9B06-4C42-98F9-8B17E9AEE8F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{CF78D95A-31E4-4005-8865-204A5FB90351} = {01B3759B-FA05-4356-B8A4-88A94ABDFDFB}
+		{74EA9C3E-9B06-4C42-98F9-8B17E9AEE8F1} = {01B3759B-FA05-4356-B8A4-88A94ABDFDFB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C178F4C-FD35-41B6-899B-A6BB84B46B13}

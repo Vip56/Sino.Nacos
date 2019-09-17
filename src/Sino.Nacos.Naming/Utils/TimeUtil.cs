@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sino.Nacos.Utilities
+namespace Sino.Nacos.Naming.Utils
 {
     public static class TimeUtil
     {

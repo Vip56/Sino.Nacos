@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Sino.Nacos.Common
+﻿namespace Sino.Nacos.Naming
 {
     public class Constants
     {
