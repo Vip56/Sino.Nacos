@@ -36,7 +36,6 @@ namespace Sino.Nacos.Naming.Core
                 while(true)
                 {
                     ServiceInfo info = null;
-                    info = changedServices.Take();
 
                     if(changedServices.TryTake(out info, TAKE_WAIT_MILLISECONDS_TIMEOUT))
                     {
@@ -78,11 +77,11 @@ namespace Sino.Nacos.Naming.Core
             var observers = new ConcurrentList<Action<IEvent>>();
             observers.Add(listener);
 
-            observers = observerMap.GetOrAdd(ServiceInfo.GetKey(serviceInfo.Name, clusters), s => observers);
-            if (observers != null)
+            observerMap.AddOrUpdate(ServiceInfo.GetKey(serviceInfo.Name, clusters), observers, (k, v) =>
             {
-                observers.Add(listener);
-            }
+                v.Add(listener);
+                return v;
+            });
         }
 
         /// <summary>
