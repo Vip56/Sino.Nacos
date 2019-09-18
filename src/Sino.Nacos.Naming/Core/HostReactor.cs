@@ -57,14 +57,9 @@ namespace Sino.Nacos.Naming.Core
             return _serviceInfoMap;
         }
 
-        public async Task<ServiceInfo> GetServiceInfoDirectlyFromServer(string serviceName, string clusters)
+        public Task<ServiceInfo> GetServiceInfoDirectlyFromServer(string serviceName, string clusters)
         {
-            string result = await _namingProxy.QueryList(serviceName, clusters, 0, false);
-            if (string.IsNullOrEmpty(result))
-            {
-                return null;
-            }
-            return JsonConvert.DeserializeObject<ServiceInfo>(result);
+            return _namingProxy.QueryList(serviceName, clusters, 0, false);
         }
 
         public async Task<ServiceInfo> GetServiceInfo(string serviceName, string clusters)
@@ -134,9 +129,8 @@ namespace Sino.Nacos.Naming.Core
         /// <summary>
         /// 获取新服务信息并与缓存对比后返回最新
         /// </summary>
-        public ServiceInfo ProcessServiceJson(string json)
+        public ServiceInfo ProcessServiceJson(ServiceInfo serviceInfo)
         {
-            ServiceInfo serviceInfo = JsonConvert.DeserializeObject<ServiceInfo>(json);
             ServiceInfo oldService = null;
             _serviceInfoMap.TryGetValue(serviceInfo.GetKey(), out oldService);
 
@@ -213,9 +207,9 @@ namespace Sino.Nacos.Naming.Core
 
             try
             {
-                string result = await _namingProxy.QueryList(serviceName, clusters, 0, false);
+                var result = await _namingProxy.QueryList(serviceName, clusters, 0, false);
 
-                if (!string.IsNullOrEmpty(result))
+                if (result != null)
                 {
                     ProcessServiceJson(result);
                 }

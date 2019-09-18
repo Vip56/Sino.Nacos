@@ -158,7 +158,7 @@ namespace Sino.Nacos.Naming.Net
             return await ReqApi(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Post);
         }
 
-        public async Task DeregisterService(string serviceName, Instance instance)
+        public async Task<string> DeregisterService(string serviceName, Instance instance)
         {
             _logger.Info($"[DEREGITER-SERVICE] {_namespace} deregistering service {serviceName} with instance: {instance}");
 
@@ -169,11 +169,12 @@ namespace Sino.Nacos.Naming.Net
             paramValue.Add(SERVICE_IP_KEY, instance.Ip);
             paramValue.Add(SERVICE_PORT_KEY, instance.Port.ToString());
             paramValue.Add(SERVICE_EPHEMERAL_KEY, instance.Ephemeral.ToString());
+            // 根据Open API这里groupName没有传递
 
-            await ReqApi(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Delete);
+            return await ReqApi(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Delete);
         }
 
-        public async Task UpdateInstance(string serviceName, string groupName, Instance instance)
+        public async Task<string> UpdateInstance(string serviceName, string groupName, Instance instance)
         {
             _logger.Info($"[UPDATE-SERVICE] {_namespace} update service {serviceName} with instance: {instance}");
 
@@ -189,7 +190,7 @@ namespace Sino.Nacos.Naming.Net
             paramValue.Add(SERVICE_EPHEMERAL_KEY, instance.Ephemeral.ToString());
             paramValue.Add(SERVICE_METADATA_KEY, JsonConvert.SerializeObject(instance.Metadata));
 
-            await ReqApi(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Put);
+            return await ReqApi(UtilAndComs.NACOS_URL_INSTANCE, paramValue, HttpMethod.Put);
         }
 
         public async Task<Service> QueryService(string serviceName, string groupName)
@@ -201,11 +202,12 @@ namespace Sino.Nacos.Naming.Net
             paramValue.Add(SERVICE_NAME_KEY, serviceName);
             paramValue.Add(GROUP_NAME_KEY, groupName);
 
+            // 模型与实际Open API有出入
             var result = await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Get);
             return JsonConvert.DeserializeObject<Service>(result);
         }
 
-        public async Task CreateService(Service service, Selector selector)
+        public async Task<string> CreateService(Service service, Selector selector)
         {
             _logger.Info($"[CREATE-SERVICE] {_namespace} create service: {service}");
 
@@ -217,7 +219,7 @@ namespace Sino.Nacos.Naming.Net
             paramValue.Add(SERVICE_METADATA_KEY, JsonConvert.SerializeObject(service.Metadata));
             paramValue.Add(SELECTOR_KEY, JsonConvert.SerializeObject(selector));
 
-            await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Post);
+            return await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Post);
         }
 
         public async Task<bool> DeleteService(string serviceName, string groupName)
@@ -233,7 +235,7 @@ namespace Sino.Nacos.Naming.Net
             return "ok".Equals(result);
         }
 
-        public async Task UpdateService(Service service, Selector selector)
+        public async Task<string> UpdateService(Service service, Selector selector)
         {
             _logger.Info($"[UPDATE-SERVICE] {_namespace} updating service : {service}");
 
@@ -245,18 +247,21 @@ namespace Sino.Nacos.Naming.Net
             paramValue.Add(SERVICE_METADATA_KEY, JsonConvert.SerializeObject(service.Metadata));
             paramValue.Add(SELECTOR_KEY, JsonConvert.SerializeObject(selector));
 
-            await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Put);
+            return await ReqApi(UtilAndComs.NACOS_URL_SERVICE, paramValue, HttpMethod.Put);
         }
 
-        public async Task<string> QueryList(string serviceName, string clusters, int udpPort, bool healthyOnly)
+        public async Task<ServiceInfo> QueryList(string serviceName, string clusters, int udpPort, bool healthyOnly)
         {
             Dictionary<string, string> paramValue = new Dictionary<string, string>();
             paramValue.Add(NAMESPACE_ID_KEY, _namespace);
             paramValue.Add(SERVICE_NAME_KEY, serviceName);
             paramValue.Add(CLUSTERS_KEY, clusters);
             paramValue.Add(HEALTHY_ONLY, healthyOnly.ToString());
+            // 根据 Open API 确少 groupName参数
 
-            return await ReqApi(UtilAndComs.NACOS_URL_BASE + "/instance/list", paramValue, HttpMethod.Get);
+            var result = await ReqApi(UtilAndComs.NACOS_URL_BASE + "/instance/list", paramValue, HttpMethod.Get);
+
+            return JsonConvert.DeserializeObject<ServiceInfo>(result);
         }
 
         public async Task<long> SendBeat(BeatInfo beatInfo)
@@ -269,6 +274,7 @@ namespace Sino.Nacos.Naming.Net
                 paramValue.Add(BEAT_KEY, beatInfo.ToString());
                 paramValue.Add(NAMESPACE_ID_KEY, _namespace);
                 paramValue.Add(SERVICE_NAME_KEY, beatInfo.ServiceName);
+                // 根据Open API确少 groupName参数
                 string result = await ReqApi(UtilAndComs.NACOS_URL_BASE + "/instance/beat", paramValue, HttpMethod.Put);
 
                 // 这里还需要从结果的Json中获取clientBeatInterval的值返回，但是实际openApi文档中只返回OK
@@ -311,7 +317,7 @@ namespace Sino.Nacos.Naming.Net
 
         public async Task<IList<string>> GetServerListFromEndpoint()
         {
-            string urlString = $"http://{_endpoint}/nacos/serverlist";
+            string urlString = $"{_endpoint}/nacos/serverlist";
             var headers = BuilderHeaders();
 
             try

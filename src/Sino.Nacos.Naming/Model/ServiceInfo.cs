@@ -1,4 +1,5 @@
-﻿using Sino.Nacos.Naming.Utils;
+﻿using Newtonsoft.Json;
+using Sino.Nacos.Naming.Utils;
 using System;
 using System.Collections.Generic;
 using System.Web;
@@ -10,20 +11,28 @@ namespace Sino.Nacos.Naming.Model
     /// </summary>
     public class ServiceInfo
     {
+        [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("groupName")]
         public string GroupName { get; set; }
 
+        [JsonProperty("clusters")]
         public string Clusters { get; set; }
 
+        [JsonProperty("cacheMillis")]
         public long CacheMillis { get; set; } = 1000;
 
+        [JsonProperty("hosts")]
         public IList<Instance> Hosts { get; set; } = new List<Instance>();
 
+        [JsonProperty("lastRefTime")]
         public long LastRefTime { get; set; } = 0;
 
+        [JsonProperty("checksum")]
         public string CheckSum { get; set; } = "";
 
+        [JsonProperty("allips")]
         public bool AllIPs { get; set; } = false;
 
         public ServiceInfo()
