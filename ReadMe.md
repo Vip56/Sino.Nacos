@@ -66,3 +66,6 @@ public class PreservedMetadataKeys
 
 ### 依赖版本
 只支持Asp.Net Core 2.1+项目
+
+### 修订记录
+* 19.9.18 完成NamingProxy与EventDispatcher单元测试;
