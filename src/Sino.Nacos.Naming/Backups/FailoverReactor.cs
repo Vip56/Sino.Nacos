@@ -21,18 +21,18 @@ namespace Sino.Nacos.Naming.Backups
     /// </remarks>
     public class FailoverReactor
     {
-        public const int SWITCH_REFRESHER_DUETIME = 0;
-        public const int SWITCH_REFRESHER_PERIOD = 5000;
-        public const int DISK_FILE_WRITER_DUETIME = 30 * 60 * 1000;
-        public const int DISK_FILE_WRITER_PERIOD = 24 * 60 * 60 * 1000;
-        public const int DIR_NOT_FOUND_DUETIME = 10 * 1000;
-        public const string FAILOVER_MODE_NAME = "failover-mode";
-        public const string FAILOVER_PATH = "failover";
+        public static int SWITCH_REFRESHER_DUETIME = 0;
+        public static int SWITCH_REFRESHER_PERIOD = 5000;
+        public static int DISK_FILE_WRITER_DUETIME = 30 * 60 * 1000;
+        public static int DISK_FILE_WRITER_PERIOD = 24 * 60 * 60 * 1000;
+        public static int DIR_NOT_FOUND_DUETIME = 10 * 1000;
+        public static string FAILOVER_MODE_NAME = "failover-mode";
+        public static string FAILOVER_PATH = "failover";
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _failoverDir;
-        private HostReactor _hostReactor;
+        private IHostReactor _hostReactor;
 
         private Timer _switchRefresher;
         private Timer _diskFileWriter;
@@ -42,7 +42,7 @@ namespace Sino.Nacos.Naming.Backups
 
         private long _failoverLastModifiedMillis = 0;
 
-        public FailoverReactor(HostReactor hostReactor, string cacheDir)
+        public FailoverReactor(IHostReactor hostReactor, string cacheDir)
         {
             _hostReactor = hostReactor;
             _failoverDir = Path.Combine(cacheDir, FAILOVER_PATH);
@@ -199,8 +199,11 @@ namespace Sino.Nacos.Naming.Backups
         public bool IsFailoverSwitch()
         {
             string failover = "false";
-            _switchParams.TryGetValue(FAILOVER_MODE_NAME, out failover);
-            return failover.Equals("false") ? false : true;
+            if(_switchParams.TryGetValue(FAILOVER_MODE_NAME, out failover))
+            {
+                return failover.Equals("false") ? false : true;
+            }
+            return false;
         }
 
         /// <summary>

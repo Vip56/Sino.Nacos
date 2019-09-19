@@ -16,7 +16,7 @@ namespace Sino.Nacos.Naming.Core
     /// <summary>
     /// 实例维护
     /// </summary>
-    public class HostReactor
+    public class HostReactor : IHostReactor
     {
         public const int DEFAULT_DELAY = 1000;
         public const int UPDATE_HOLD_INTERVAL = 5 * 1000;
