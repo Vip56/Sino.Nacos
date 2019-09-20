@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using Sino.Nacos.Naming.Core;
 using System.IO;
 using System.Threading.Tasks;
+using Xunit;
+using System.Threading;
 
 namespace NacosNamingUnitTest
 {
@@ -20,8 +22,6 @@ namespace NacosNamingUnitTest
         private NamingConfig _config;
         private ServiceInfo _orderServiceInfo;
         private ServiceInfo _inquiryServiceInfo;
-        private Service _service;
-        private BeatInfo _beatInfo;
 
         private HostReactor _hostReactor;
 
@@ -74,119 +74,123 @@ namespace NacosNamingUnitTest
             inquiryInstance.Metadata.Add("k2", "v2");
             _inquiryServiceInfo.Hosts.Add(inquiryInstance);
             _inquiryServiceInfo.LastRefTime = DateTime.Now.GetTimeStamp();
-
-            _service = new Service("tms_order_v1");
-            _service.GroupName = "test";
-            _service.ProtectThreshold = 1;
-            _service.AppName = "testhost";
-            _service.Metadata.Add("k1", "v1");
-
-            _beatInfo = new BeatInfo();
-            _beatInfo.Port = 5000;
-            _beatInfo.Ip = "192.168.1.101";
-            _beatInfo.Weight = 1;
-            _beatInfo.ServiceName = "tms_order_v1";
-            _beatInfo.Cluster = "tms";
-            _beatInfo.MetaData.Add("k1", "v1");
-            _beatInfo.Scheduled = true;
-            _beatInfo.PerId = 1000;
-            _beatInfo.Stopped = false;
         }
 
         private NamingProxy MockNamingProxy()
         {
             var mockHttp = new MockHttpMessageHandler();
 
-            // RegisterService
-            mockHttp.When(HttpMethod.Post, _config.ServerAddr[0] + UtilAndComs.NACOS_URL_INSTANCE)
-                .WithQueryString(NamingProxy.NAMESPACE_ID_KEY, _config.Namespace)
-                .WithQueryString(NamingProxy.SERVICE_NAME_KEY, _orderServiceInfo.Name)
-                .WithQueryString(NamingProxy.GROUP_NAME_KEY, _orderServiceInfo.GroupName)
-                .WithQueryString(NamingProxy.CLUSTER_NAME_KEY, _orderServiceInfo.Clusters)
-                .WithQueryString(NamingProxy.SERVICE_IP_KEY, _orderServiceInfo.Hosts.First().Ip)
-                .WithQueryString(NamingProxy.SERVICE_PORT_KEY, _orderServiceInfo.Hosts.First().Port.ToString())
-                .WithQueryString(NamingProxy.SERVICE_WEIGHT_KEY, _orderServiceInfo.Hosts.First().Weight.ToString())
-                .WithQueryString(NamingProxy.SERVICE_ENABLE_KEY, _orderServiceInfo.Hosts.First().Enable.ToString())
-                .WithQueryString(NamingProxy.SERVICE_HEALTHY_KEY, _orderServiceInfo.Hosts.First().Healthy.ToString())
-                .WithQueryString(NamingProxy.SERVICE_EPHEMERAL_KEY, _orderServiceInfo.Hosts.First().Ephemeral.ToString())
-                .WithQueryString(NamingProxy.SERVICE_METADATA_KEY, JsonConvert.SerializeObject(_orderServiceInfo.Hosts.First().Metadata))
-                .Respond("application/json", "ok");
+            Func<HttpRequestMessage, HttpContent> orderHandler = x =>
+            {
+                return new StringContent(JsonConvert.SerializeObject(_orderServiceInfo), Encoding.UTF8, "application/json");
+            };
 
-            // DeregisterService
-            mockHttp.When(HttpMethod.Delete, _config.ServerAddr[0] + UtilAndComs.NACOS_URL_INSTANCE)
-                .WithQueryString(NamingProxy.NAMESPACE_ID_KEY, _config.Namespace)
-                .WithQueryString(NamingProxy.SERVICE_ENABLE_KEY, _orderServiceInfo.Name)
-                .WithQueryString(NamingProxy.CLUSTER_NAME_KEY, _orderServiceInfo.Clusters)
-                .WithQueryString(NamingProxy.SERVICE_IP_KEY, _orderServiceInfo.Hosts.First().Ip)
-                .WithQueryString(NamingProxy.SERVICE_PORT_KEY, _orderServiceInfo.Hosts.First().Port.ToString())
-                .WithQueryString(NamingProxy.SERVICE_EPHEMERAL_KEY, _orderServiceInfo.Hosts.First().Ephemeral.ToString())
-                .Respond("application/json", "ok");
+            Func<HttpRequestMessage, HttpContent> inquiryHandler = x =>
+            {
+                return new StringContent(JsonConvert.SerializeObject(_inquiryServiceInfo), Encoding.UTF8, "application/json");
+            };
 
-            // UpdateInstance
-            mockHttp.When(HttpMethod.Put, _config.ServerAddr[0] + UtilAndComs.NACOS_URL_INSTANCE)
-                .WithQueryString(NamingProxy.NAMESPACE_ID_KEY, _config.Namespace)
-                .WithQueryString(NamingProxy.SERVICE_NAME_KEY, _orderServiceInfo.Name)
-                .WithQueryString(NamingProxy.GROUP_NAME_KEY, _orderServiceInfo.GroupName)
-                .WithQueryString(NamingProxy.CLUSTER_NAME_KEY, _orderServiceInfo.Clusters)
-                .WithQueryString(NamingProxy.SERVICE_IP_KEY, _orderServiceInfo.Hosts.First().Ip)
-                .WithQueryString(NamingProxy.SERVICE_PORT_KEY, _orderServiceInfo.Hosts.First().Port.ToString())
-                .WithQueryString(NamingProxy.SERVICE_WEIGHT_KEY, _orderServiceInfo.Hosts.First().Weight.ToString())
-                .WithQueryString(NamingProxy.SERVICE_ENABLE_KEY, _orderServiceInfo.Hosts.First().Enable.ToString())
-                .WithQueryString(NamingProxy.SERVICE_EPHEMERAL_KEY, _orderServiceInfo.Hosts.First().Ephemeral.ToString())
-                .WithQueryString(NamingProxy.SERVICE_METADATA_KEY, JsonConvert.SerializeObject(_orderServiceInfo.Hosts.First().Metadata))
-                .Respond("application/json", "ok");
-
-            // QueryService
+            // QueryList
             mockHttp.When(HttpMethod.Get, _config.ServerAddr[0] + UtilAndComs.NACOS_URL_BASE + "/instance/list")
                 .WithQueryString(NamingProxy.NAMESPACE_ID_KEY, _config.Namespace)
-                .WithQueryString(NamingProxy.SERVICE_NAME_KEY, _service.Name)
-                .WithQueryString(NamingProxy.CLUSTERS_KEY, "tms")
-                .WithQueryString(NamingProxy.HEALTHY_ONLY, "True")
-                .Respond("application/json", JsonConvert.SerializeObject(_service));
+                .WithQueryString(NamingProxy.SERVICE_NAME_KEY, _orderServiceInfo.Name)
+                .WithQueryString(NamingProxy.CLUSTERS_KEY, _orderServiceInfo.Clusters)
+                .WithQueryString(NamingProxy.HEALTHY_ONLY, "False")
+                .Respond(orderHandler);
 
-            // SendBeat
-            mockHttp.When(HttpMethod.Put, _config.ServerAddr[0] + UtilAndComs.NACOS_URL_BASE + "/instance/beat")
-                .WithQueryString(NamingProxy.BEAT_KEY, _beatInfo.ToString())
+            mockHttp.When(HttpMethod.Get, _config.ServerAddr[0] + UtilAndComs.NACOS_URL_BASE + "/instance/list")
                 .WithQueryString(NamingProxy.NAMESPACE_ID_KEY, _config.Namespace)
-                .WithQueryString(NamingProxy.SERVICE_NAME_KEY, _beatInfo.ServiceName)
-                .Respond("application/json", "ok");
-
-            // ServerHealthy
-            ServiceMetrics mockServiceMetrics = new ServiceMetrics();
-            mockServiceMetrics.ServiceCount = 336;
-            mockServiceMetrics.Load = 0.09f;
-            mockServiceMetrics.Mem = 0.46210432f;
-            mockServiceMetrics.ResponsibleServiceCount = 98;
-            mockServiceMetrics.InstanceCount = 4;
-            mockServiceMetrics.Cpu = 0.010242796f;
-            mockServiceMetrics.Status = "UP";
-            mockServiceMetrics.ResponsibleInstanceCount = 0;
-
-            var request = mockHttp.When(HttpMethod.Get, _config.ServerAddr[0] + UtilAndComs.NACOS_URL_BASE + "/operator/metrics")
-                .Respond("application/json", JsonConvert.SerializeObject(mockServiceMetrics));
-
-            // GetServiceList
-            ServiceList mockServiceList = new ServiceList();
-            mockServiceList.Count = 336;
-            mockServiceList.Doms.Add("tms_order_v1");
-            mockServiceList.Doms.Add("tms_order_v2");
-
-            mockHttp.When(HttpMethod.Get, _config.ServerAddr[0] + UtilAndComs.NACOS_URL_BASE + "/service/list")
-                .WithQueryString(NamingProxy.PAGE_NO_KEY, "1")
-                .WithQueryString(NamingProxy.PAGE_SIZE_KEY, "2")
-                .WithQueryString(NamingProxy.NAMESPACE_ID_KEY, _config.Namespace)
-                .WithQueryString(NamingProxy.GROUP_NAME_KEY, "test")
-                .Respond("application/json", JsonConvert.SerializeObject(mockServiceList));
-
-            // GetServerListFromEndpoint
-            string[] servers = new string[] { "http://192.168.1.1:8848", "http://192.168.1.2:8848" };
-
-            mockHttp.When(HttpMethod.Get, _config.EndPoint + "/nacos/serverlist")
-                .Respond("application/json", string.Join("\r\n", servers));
+                .WithQueryString(NamingProxy.SERVICE_NAME_KEY, _inquiryServiceInfo.Name)
+                .WithQueryString(NamingProxy.CLUSTERS_KEY, _inquiryServiceInfo.Clusters)
+                .WithQueryString(NamingProxy.HEALTHY_ONLY, "False")
+                .Respond(inquiryHandler);
 
             return new NamingProxy(_config, new FastHttp(FakeHttpClientFactory.Create(mockHttp.ToHttpClient()), _config));
         }
 
-        public async Task  
+        [Fact]
+        public async Task GetServiceInfoTest()
+        {
+            var orderInfo = await _hostReactor.GetServiceInfo(_orderServiceInfo.Name, _orderServiceInfo.Clusters);
+
+            Assert.NotNull(orderInfo);
+            Assert.Equal(orderInfo.Name, _orderServiceInfo.Name);
+            Assert.Equal(orderInfo.GroupName, _orderServiceInfo.GroupName);
+            Assert.Equal(orderInfo.Clusters, _orderServiceInfo.Clusters);
+            Assert.Equal(orderInfo.Hosts.Count, _orderServiceInfo.Hosts.Count);
+            Assert.Equal(orderInfo.Hosts.First().InstanceId, _orderServiceInfo.Hosts.First().InstanceId);
+            Assert.Equal(orderInfo.Hosts.First().Ip, _orderServiceInfo.Hosts.First().Ip);
+            Assert.Equal(orderInfo.Hosts.First().Metadata.Count, _orderServiceInfo.Hosts.First().Metadata.Count);
+            Assert.Equal(orderInfo.Hosts.First().Port, _orderServiceInfo.Hosts.First().Port);
+            Assert.Equal(orderInfo.Hosts.First().ServiceName, _orderServiceInfo.Hosts.First().ServiceName);
+            Assert.Equal(orderInfo.LastRefTime, _orderServiceInfo.LastRefTime);
+
+            orderInfo = await _hostReactor.GetServiceInfo(_orderServiceInfo.Name, _orderServiceInfo.Clusters);
+
+            Assert.NotNull(orderInfo);
+        }
+
+        [Fact]
+        public async Task GetServiceInfoWithAutoFlushTest()
+        {
+            HostReactor.DEFAULT_DELAY = 500;
+
+            var orderInfo = await _hostReactor.GetServiceInfo(_orderServiceInfo.Name, _orderServiceInfo.Clusters);
+
+            Assert.NotNull(orderInfo);
+
+            _orderServiceInfo.Hosts.First().Ip = "192.168.2.50";
+            _orderServiceInfo.Hosts.First().Port = 5500;
+            _orderServiceInfo.LastRefTime = DateTime.Now.GetTimeStamp();
+
+            Thread.Sleep(1100);
+
+            orderInfo = await _hostReactor.GetServiceInfo(_orderServiceInfo.Name, _orderServiceInfo.Clusters);
+
+            Assert.NotNull(orderInfo);
+            Assert.Equal(orderInfo.Hosts.First().Ip, _orderServiceInfo.Hosts.First().Ip);
+            Assert.Equal(orderInfo.Hosts.First().Port, _orderServiceInfo.Hosts.First().Port);
+        }
+
+        [Fact]
+        public async Task GetTwoServiceInfoTest()
+        {
+            var orderInfo = await _hostReactor.GetServiceInfo(_orderServiceInfo.Name, _orderServiceInfo.Clusters);
+            var inquiryInfo = await _hostReactor.GetServiceInfo(_inquiryServiceInfo.Name, _orderServiceInfo.Clusters);
+
+            Assert.NotNull(orderInfo);
+            Assert.NotNull(inquiryInfo);
+            Assert.Equal(inquiryInfo.Name, _inquiryServiceInfo.Name);
+            Assert.Equal(inquiryInfo.GroupName, _inquiryServiceInfo.GroupName);
+            Assert.Equal(inquiryInfo.Clusters, _inquiryServiceInfo.Clusters);
+            Assert.Equal(inquiryInfo.Hosts.Count, _inquiryServiceInfo.Hosts.Count);
+            Assert.Equal(inquiryInfo.Hosts.First().InstanceId, _inquiryServiceInfo.Hosts.First().InstanceId);
+            Assert.Equal(inquiryInfo.Hosts.First().Ip, _inquiryServiceInfo.Hosts.First().Ip);
+            Assert.Equal(inquiryInfo.Hosts.First().Metadata.Count, _inquiryServiceInfo.Hosts.First().Metadata.Count);
+            Assert.Equal(inquiryInfo.Hosts.First().Port, _inquiryServiceInfo.Hosts.First().Port);
+            Assert.Equal(inquiryInfo.Hosts.First().ServiceName, _inquiryServiceInfo.Hosts.First().ServiceName);
+            Assert.Equal(inquiryInfo.LastRefTime, _inquiryServiceInfo.LastRefTime);
+
+            _inquiryServiceInfo.Hosts.First().Ip = "192.168.1.1";
+            _inquiryServiceInfo.Hosts.First().Port = 5300;
+
+            _orderServiceInfo.Hosts.First().Ip = "192.168.2.1";
+            _orderServiceInfo.Hosts.First().Port = 5200;
+
+            _inquiryServiceInfo.LastRefTime = DateTime.Now.GetTimeStamp();
+            _orderServiceInfo.LastRefTime = DateTime.Now.GetTimeStamp();
+
+            Thread.Sleep(1100);
+
+            orderInfo = await _hostReactor.GetServiceInfo(_orderServiceInfo.Name, _orderServiceInfo.Clusters);
+            inquiryInfo = await _hostReactor.GetServiceInfo(_inquiryServiceInfo.Name, _inquiryServiceInfo.Clusters);
+
+            Assert.NotNull(inquiryInfo);
+            Assert.NotNull(orderInfo);
+            Assert.Equal(orderInfo.Hosts.First().Ip, _orderServiceInfo.Hosts.First().Ip);
+            Assert.Equal(orderInfo.Hosts.First().Port, _orderServiceInfo.Hosts.First().Port);
+            Assert.Equal(inquiryInfo.Hosts.First().Ip, _inquiryServiceInfo.Hosts.First().Ip);
+            Assert.Equal(inquiryInfo.Hosts.First().Port, _inquiryServiceInfo.Hosts.First().Port);
+        }
     }
 }

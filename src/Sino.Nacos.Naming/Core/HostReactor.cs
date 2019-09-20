@@ -17,8 +17,8 @@ namespace Sino.Nacos.Naming.Core
     /// </summary>
     public class HostReactor : IHostReactor
     {
-        public const int DEFAULT_DELAY = 1000;
-        public const int UPDATE_HOLD_INTERVAL = 5 * 1000;
+        public static int DEFAULT_DELAY = 1000;
+        public static int UPDATE_HOLD_INTERVAL = 5 * 1000;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -82,20 +82,6 @@ namespace Sino.Nacos.Naming.Core
                 await UpdateServiceNow(serviceName, clusters);
                 _updatingMap.Remove(serviceName);
             }
-            else if(_updatingMap.ContainsKey(serviceName))
-            {
-                if (UPDATE_HOLD_INTERVAL > 0)
-                {
-                    try
-                    {
-                        Monitor.Wait(serviceObj, UPDATE_HOLD_INTERVAL);
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger.Error(ex, $"[getServiceInfo] serviceName: {serviceName}, clusters: {clusters}");
-                    }
-                }
-            }
 
             ScheduleUpdateIfAbsent(serviceName, clusters);
 
@@ -147,7 +133,14 @@ namespace Sino.Nacos.Naming.Core
                     _logger.Warn($"out of date data received, old-t: {oldService.LastRefTime}, new-t: {serviceInfo.LastRefTime}");
                 }
 
-                _serviceInfoMap.Add(serviceInfo.GetKey(), serviceInfo);
+                if (_serviceInfoMap.ContainsKey(serviceInfo.GetKey()))
+                {
+                    _serviceInfoMap[serviceInfo.GetKey()] = serviceInfo;
+                }
+                else
+                {
+                    _serviceInfoMap.Add(serviceInfo.GetKey(), serviceInfo);
+                }
 
                 var oldHostMap = oldService.Hosts.ToDictionary(x => x.ToInetAddr());
                 var newHostMap = serviceInfo.Hosts.ToDictionary(x => x.ToInetAddr());
@@ -216,13 +209,6 @@ namespace Sino.Nacos.Naming.Core
             catch (Exception ex)
             {
                 _logger.Error(ex, $"[NA] failed to update serviceName: {serviceName}");
-            }
-            finally
-            {
-                if (oldService != null)
-                {
-                    Monitor.PulseAll(oldService);
-                }
             }
         }
 
