@@ -14,7 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{296B3395-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sino.Nacos.Naming", "src\Sino.Nacos.Naming\Sino.Nacos.Naming.csproj", "{74EA9C3E-9B06-4C42-98F9-8B17E9AEE8F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NacosNamingUnitTest", "test\NacosNamingUnitTest\NacosNamingUnitTest.csproj", "{43361E6B-10B0-4DA0-AAC2-1B4815952E54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NacosNamingUnitTest", "test\NacosNamingUnitTest\NacosNamingUnitTest.csproj", "{43361E6B-10B0-4DA0-AAC2-1B4815952E54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NacosNamingSample", "test\NacosNamingSample\NacosNamingSample.csproj", "{15153D47-7A1A-4852-9A17-468AFB618F93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +32,10 @@ Global
 		{43361E6B-10B0-4DA0-AAC2-1B4815952E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43361E6B-10B0-4DA0-AAC2-1B4815952E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43361E6B-10B0-4DA0-AAC2-1B4815952E54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15153D47-7A1A-4852-9A17-468AFB618F93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15153D47-7A1A-4852-9A17-468AFB618F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15153D47-7A1A-4852-9A17-468AFB618F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15153D47-7A1A-4852-9A17-468AFB618F93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +43,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{74EA9C3E-9B06-4C42-98F9-8B17E9AEE8F1} = {01B3759B-FA05-4356-B8A4-88A94ABDFDFB}
 		{43361E6B-10B0-4DA0-AAC2-1B4815952E54} = {296B3395-F271-445E-B2CD-185DDBD54BE0}
+		{15153D47-7A1A-4852-9A17-468AFB618F93} = {296B3395-F271-445E-B2CD-185DDBD54BE0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C178F4C-FD35-41B6-899B-A6BB84B46B13}
