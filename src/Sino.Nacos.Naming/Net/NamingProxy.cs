@@ -276,8 +276,9 @@ namespace Sino.Nacos.Naming.Net
                 paramValue.Add(SERVICE_NAME_KEY, beatInfo.ServiceName);
                 // 根据Open API确少 groupName参数
                 string result = await ReqApi(UtilAndComs.NACOS_URL_BASE + "/instance/beat", paramValue, HttpMethod.Put);
-
-                // 这里还需要从结果的Json中获取clientBeatInterval的值返回，但是实际openApi文档中只返回OK
+                
+                BeatResult beatResult = JsonConvert.DeserializeObject<BeatResult>(result);
+                return beatResult.ClientBeatInterval;
             }
             catch (Exception ex)
             {

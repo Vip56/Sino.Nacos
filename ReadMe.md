@@ -43,7 +43,14 @@ public class PreservedMetadataKeys
     }
 ```
 
+### 启动Nacos服务端    
+这里建议使用者参考官网文档基于Docker启动该[服务](https://nacos.io/zh-cn/docs/quick-start-docker.html)
+
 ## 额外说明
+
+### 使用注意
+1. 在进行服务注册时候如果需要自定义命名空间，需要首先在Nacos服务端创建一个新的命名空间然后将空间的Id（GUID）做为本SDK的namespace参数而不是名字;    
+2. 
 
 ### 暂不支持功能
 通过改写的过程中考虑到其情况部分功能进行了适当的删减和阉割，但是为了保证和官方的其他SDK之间的数据保持一致，这部分完全参考官方SDK进行设计开发。
