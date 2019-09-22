@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 namespace Sino.Nacos.Naming.Core
 {
@@ -22,9 +24,9 @@ namespace Sino.Nacos.Naming.Core
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private Dictionary<string, Timer> _timerMap = new Dictionary<string, Timer>();
-        private Dictionary<string, ServiceInfo> _serviceInfoMap;
-        private Dictionary<string, object> _updatingMap = new Dictionary<string, object>();
+        private ConcurrentDictionary<string, Timer> _timerMap = new ConcurrentDictionary<string, Timer>();
+        private ConcurrentDictionary<string, ServiceInfo> _serviceInfoMap;
+        private ConcurrentDictionary<string, Task> _updating = new ConcurrentDictionary<string, Task>();
 
         private EventDispatcher _eventDispatcher;
         private NamingProxy _namingProxy;
@@ -41,17 +43,17 @@ namespace Sino.Nacos.Naming.Core
             _cacheDir = cacheDir;
             if (loadCacheStart)
             {
-                _serviceInfoMap = new Dictionary<string, ServiceInfo>(DiskCache.GetServiceInfos(_cacheDir));
+                _serviceInfoMap = new ConcurrentDictionary<string, ServiceInfo>(DiskCache.GetServiceInfos(_cacheDir));
             }
             else
             {
-                _serviceInfoMap = new Dictionary<string, ServiceInfo>(16);
+                _serviceInfoMap = new ConcurrentDictionary<string, ServiceInfo>();
             }
 
             _failoverReactor = new FailoverReactor(this, _cacheDir);
         }
 
-        public Dictionary<string, ServiceInfo> GetServiceInfoMap()
+        public ConcurrentDictionary<string, ServiceInfo> GetServiceInfoMap()
         {
             return _serviceInfoMap;
         }
@@ -75,17 +77,22 @@ namespace Sino.Nacos.Naming.Core
 
             if (serviceObj == null)
             {
-                serviceObj = new ServiceInfo(serviceName, clusters);
-                _serviceInfoMap.Add(key, serviceObj);
-
-                _updatingMap.Add(serviceName, new object());
-                await UpdateServiceNow(serviceName, clusters);
-                _updatingMap.Remove(serviceName);
+                Task wait;
+                if (_updating.TryGetValue(key, out wait))
+                {
+                    wait.Wait();
+                }
+                else
+                {
+                    wait = UpdateServiceNow(serviceName, clusters);
+                    _updating.TryAdd(key, wait);
+                    await wait;
+                }
             }
 
             ScheduleUpdateIfAbsent(serviceName, clusters);
 
-            return _serviceInfoMap[serviceObj.GetKey()];
+            return _serviceInfoMap[key];
         }
 
         /// <summary>
@@ -107,7 +114,7 @@ namespace Sino.Nacos.Naming.Core
                 }
 
                 var t = UpdateTask(serviceName, clusters);
-                _timerMap.Add(key, t);
+                _timerMap.TryAdd(key, t);
             }
         }
 
@@ -133,14 +140,7 @@ namespace Sino.Nacos.Naming.Core
                     _logger.Warn($"out of date data received, old-t: {oldService.LastRefTime}, new-t: {serviceInfo.LastRefTime}");
                 }
 
-                if (_serviceInfoMap.ContainsKey(serviceInfo.GetKey()))
-                {
-                    _serviceInfoMap[serviceInfo.GetKey()] = serviceInfo;
-                }
-                else
-                {
-                    _serviceInfoMap.Add(serviceInfo.GetKey(), serviceInfo);
-                }
+                _serviceInfoMap.AddOrUpdate(serviceInfo.GetKey(), serviceInfo, (k, v) => serviceInfo);
 
                 var oldHostMap = oldService.Hosts.ToDictionary(x => x.ToInetAddr());
                 var newHostMap = serviceInfo.Hosts.ToDictionary(x => x.ToInetAddr());
@@ -177,7 +177,7 @@ namespace Sino.Nacos.Naming.Core
             {
                 changed = true;
                 _logger.Info($"init new ips({serviceInfo.IpCount()}) service: {serviceInfo.GetKey()} -> {JsonConvert.SerializeObject(serviceInfo.Hosts)}");
-                _serviceInfoMap.Add(serviceInfo.GetKey(), serviceInfo);
+                _serviceInfoMap.TryAdd(serviceInfo.GetKey(), serviceInfo);
                 _eventDispatcher.ServiceChanged(serviceInfo);
                 DiskCache.WriteServiceInfo(_cacheDir, serviceInfo);
             }
@@ -195,11 +195,9 @@ namespace Sino.Nacos.Naming.Core
         /// </summary>
         private async Task UpdateServiceNow(string serviceName, string clusters)
         {
-            ServiceInfo oldService = GetServiceInfoInner(serviceName, clusters);
-
             try
             {
-                var result = await _namingProxy.QueryList(serviceName, clusters, 0, false);
+                var result = await _namingProxy.QueryList(serviceName, clusters, 0, false).ConfigureAwait(false);
 
                 if (result != null)
                 {

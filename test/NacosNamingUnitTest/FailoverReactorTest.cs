@@ -11,17 +11,18 @@ using Sino.Nacos.Naming.Cache;
 using System.Threading;
 using System.Linq;
 using Sino.Nacos.Naming;
+using System.Collections.Concurrent;
 
 namespace NacosNamingUnitTest
 {
     public class FailoverReactorTest
     {
         private IHostReactor _hostReactor;
-        private Dictionary<string, ServiceInfo> _serviceMap;
+        private ConcurrentDictionary<string, ServiceInfo> _serviceMap;
 
         public FailoverReactorTest()
         {
-            _serviceMap = new Dictionary<string, ServiceInfo>();
+            _serviceMap = new ConcurrentDictionary<string, ServiceInfo>();
             var orderServiceInfo = new ServiceInfo();
             orderServiceInfo.Name = "tms_order_v1";
             orderServiceInfo.GroupName = "tms";
@@ -56,8 +57,8 @@ namespace NacosNamingUnitTest
             inquiryServiceInfo.Hosts.Add(inquiryInstance);
             inquiryServiceInfo.LastRefTime = DateTime.Now.GetTimeStamp();
 
-            _serviceMap.Add(orderServiceInfo.GetKey(), orderServiceInfo);
-            _serviceMap.Add(inquiryServiceInfo.GetKey(), inquiryServiceInfo);
+            _serviceMap.TryAdd(orderServiceInfo.GetKey(), orderServiceInfo);
+            _serviceMap.TryAdd(inquiryServiceInfo.GetKey(), inquiryServiceInfo);
 
             var mockHostReactor = new Mock<IHostReactor>();
             mockHostReactor.Setup(x => x.GetServiceInfoMap()).Returns(_serviceMap);
@@ -140,7 +141,7 @@ namespace NacosNamingUnitTest
             feeServiceInfo.Hosts.Add(feeInstance);
             feeServiceInfo.LastRefTime = DateTime.Now.GetTimeStamp();
 
-            _serviceMap.Add(feeServiceInfo.GetKey(), feeServiceInfo);
+            _serviceMap.TryAdd(feeServiceInfo.GetKey(), feeServiceInfo);
 
             Thread.Sleep(500);
 

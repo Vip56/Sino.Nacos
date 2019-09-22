@@ -271,6 +271,7 @@ namespace Sino.Nacos.Naming
         /// </summary>
         /// <param name="serviceName">服务名称</param>
         /// <param name="clusters">集群名称列表</param>
+        /// <exception cref="ArgumentNullException">如果服务不存在则会抛出该异常</exception>
         Task<Instance> SelectOneHealthyInstance(string serviceName, IList<string> clusters);
 
         /// <summary>
