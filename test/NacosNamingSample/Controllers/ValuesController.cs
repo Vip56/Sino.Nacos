@@ -187,11 +187,10 @@ namespace NacosNamingSample.Controllers
             Stopwatch watch = Stopwatch.StartNew();
 
 
-            ParallelLoopResult result = Parallel.For(0, 10001, async x =>
+            ParallelLoopResult result = Parallel.For(0, 100001, async x =>
              {
                  var instance = await _namingService.SelectOneHealthyInstance("tms_order");
-                 await Task.Delay(100);
-                 if (x == 10000)
+                 if (x == 100000)
                  {
                      watch.Stop();
                      var t = watch.ElapsedMilliseconds;

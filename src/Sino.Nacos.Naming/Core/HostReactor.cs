@@ -21,6 +21,7 @@ namespace Sino.Nacos.Naming.Core
     {
         public static int DEFAULT_DELAY = 1000;
         public static int UPDATE_HOLD_INTERVAL = 5 * 1000;
+        public static int DEFAULT_GET_DELAY = 200;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -77,16 +78,17 @@ namespace Sino.Nacos.Naming.Core
 
             if (serviceObj == null)
             {
-                Task wait;
-                if (_updating.TryGetValue(key, out wait))
+                TaskCompletionSource<bool> task = new TaskCompletionSource<bool>();
+                if (_updating.TryAdd(key, task.Task))
                 {
-                    wait.Wait();
+                    await UpdateServiceNow(serviceName, clusters);
+                    task.SetResult(true);
                 }
                 else
                 {
-                    wait = UpdateServiceNow(serviceName, clusters);
-                    _updating.TryAdd(key, wait);
-                    await wait;
+                    Task wait;
+                    _updating.TryGetValue(key, out wait);
+                    wait.Wait(DEFAULT_GET_DELAY);
                 }
             }
 
