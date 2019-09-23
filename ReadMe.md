@@ -1,6 +1,9 @@
 # Sino.Nacos
 该项目将参考Nacos的[java客户端](https://github.com/alibaba/nacos/tree/develop/client)进行改写，便于直接使用该技术实现服务的注册与发现。
 
+[![Build status](https://ci.appveyor.com/api/projects/status/hwvasqhqpu48u4pk/branch/master?svg=true)](https://ci.appveyor.com/project/vip56/sino-nacos/branch/master)
+[![NuGet](https://img.shields.io/nuget/v/Nuget.Core.svg?style=plastic)](https://www.nuget.org/packages/Sino.Nacos.Naming)   
+
 ## 使用方式
 
 ### 入门操作
