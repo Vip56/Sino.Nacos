@@ -9,7 +9,7 @@
 ### 入门操作
 首先需要使用者在通过Nuget引用该类库：
 ```
-
+Install-Package Sino.Nacos.Naming -Version 1.0.0-beta1
 ```
 
 完成引用后在配置文件中按照如下进行配置的设置：
