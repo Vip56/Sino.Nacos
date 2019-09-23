@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{01B3759B-FA0
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".global", ".global", "{350A0C63-B3CE-4BF7-82CD-EECC89C7F63C}"
 	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		Build.ps1 = Build.ps1
 		ReadMe.md = ReadMe.md
 	EndProjectSection
 EndProject
@@ -16,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sino.Nacos.Naming", "src\Si
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NacosNamingUnitTest", "test\NacosNamingUnitTest\NacosNamingUnitTest.csproj", "{43361E6B-10B0-4DA0-AAC2-1B4815952E54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NacosNamingSample", "test\NacosNamingSample\NacosNamingSample.csproj", "{15153D47-7A1A-4852-9A17-468AFB618F93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NacosNamingSample", "test\NacosNamingSample\NacosNamingSample.csproj", "{15153D47-7A1A-4852-9A17-468AFB618F93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

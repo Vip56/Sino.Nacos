@@ -49,5 +49,30 @@ namespace Sino.Nacos.Naming
         /// 私钥
         /// </summary>
         public string SecretKey { get; set; }
+
+        /// <summary>
+        /// 是否自动注册
+        /// </summary>
+        public bool AutoRegister { get; set; }
+
+        /// <summary>
+        /// 注册的服务名
+        /// </summary>
+        public string ServiceName { get; set; }
+
+        /// <summary>
+        /// 注册的组名
+        /// </summary>
+        public string GroupName { get; set; }
+
+        /// <summary>
+        /// 自动注册IP前缀
+        /// </summary>
+        public string IpPrefix { get; set; }
+
+        /// <summary>
+        /// 服务端口
+        /// </summary>
+        public int Port { get; set; }
     }
 }

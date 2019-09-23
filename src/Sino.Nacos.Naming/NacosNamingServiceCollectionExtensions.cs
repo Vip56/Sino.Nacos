@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Sino.Nacos.Naming;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -24,6 +25,18 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<INamingService, NacosNamingService>();
 
             return services;
+        }
+
+        /// <summary>
+        /// 自动注册服务
+        /// </summary>
+        public static IApplicationBuilder AutoRegisterNacosNaming(this IApplicationBuilder app)
+        {
+            var namingService = app.ApplicationServices.GetService<INamingService>();
+
+            namingService.AutoRegister().Wait();
+
+            return app;
         }
     }
 }

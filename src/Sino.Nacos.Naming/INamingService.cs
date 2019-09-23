@@ -9,6 +9,11 @@ namespace Sino.Nacos.Naming
     public interface INamingService
     {
         /// <summary>
+        /// 根据配置自动注册
+        /// </summary>
+        Task AutoRegister();
+
+        /// <summary>
         /// 注册一个实例到服务中
         /// </summary>
         /// <param name="serviceName">服务名称</param>
@@ -127,7 +132,7 @@ namespace Sino.Nacos.Naming
         /// 获取服务中的实例
         /// </summary>
         /// <param name="serviceName">服务名称</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<IList<Instance>> GetAllInstances(string serviceName, bool subscribe);
 
         /// <summary>
@@ -135,7 +140,7 @@ namespace Sino.Nacos.Naming
         /// </summary>
         /// <param name="serviceName">服务名称</param>
         /// <param name="groupName">分组名称</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<IList<Instance>> GetAllInstances(string serviceName, string groupName, bool subscribe);
 
         /// <summary>
@@ -158,7 +163,7 @@ namespace Sino.Nacos.Naming
         /// </summary>
         /// <param name="serviceName">服务名称</param>
         /// <param name="clusters">集群名称列表</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<IList<Instance>> GetAllInstances(string serviceName, IList<string> clusters, bool subscribe);
 
         /// <summary>
@@ -167,7 +172,7 @@ namespace Sino.Nacos.Naming
         /// <param name="serviceName">服务名称</param>
         /// <param name="groupName">分组名称</param>
         /// <param name="clusters">集群名称列表</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<IList<Instance>> GetAllInstances(string serviceName, string groupName, IList<string> clusters, bool subscribe);
 
         /// <summary>
@@ -190,7 +195,7 @@ namespace Sino.Nacos.Naming
         /// </summary>
         /// <param name="serviceName">服务名称</param>
         /// <param name="healthy">决定获取健康还是非健康的实例</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<IList<Instance>> SelectInstances(string serviceName, bool healthy, bool subscribe);
 
         /// <summary>
@@ -199,7 +204,7 @@ namespace Sino.Nacos.Naming
         /// <param name="serviceName">服务名称</param>
         /// <param name="groupName">分组名称</param>
         /// <param name="healthy">决定获取健康还是非健康的实例</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<IList<Instance>> SelectInstances(string serviceName, string groupName, bool healthy, bool subscribe);
 
         /// <summary>
@@ -225,7 +230,7 @@ namespace Sino.Nacos.Naming
         /// <param name="serviceName">服务名称</param>
         /// <param name="clusters">集群名称列表</param>
         /// <param name="healthy">决定获取健康还是非健康的实例</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<IList<Instance>> SelectInstances(string serviceName, IList<string> clusters, bool healthy, bool subscribe);
 
         /// <summary>
@@ -235,7 +240,7 @@ namespace Sino.Nacos.Naming
         /// <param name="groupName">分组名称</param>
         /// <param name="clusters">集群名称列表</param>
         /// <param name="healthy">决定获取健康还是非健康的实例</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<IList<Instance>> SelectInstances(string serviceName, string groupName, IList<string> clusters, bool healthy, bool subscribe);
 
         /// <summary>
@@ -255,7 +260,7 @@ namespace Sino.Nacos.Naming
         /// 通过预定义的负载均衡策略选取一个健康的实例
         /// </summary>
         /// <param name="serviceName">服务名称</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<Instance> SelectOneHealthyInstance(string serviceName, bool subscribe);
 
         /// <summary>
@@ -263,7 +268,7 @@ namespace Sino.Nacos.Naming
         /// </summary>
         /// <param name="serviceName">服务名称</param>
         /// <param name="groupName">分组名称</param>
-        /// <param name="subscribe">是否为订阅</param>
+        /// <param name="subscribe">是否订阅</param>
         Task<Instance> SelectOneHealthyInstance(string serviceName, string groupName, bool subscribe);
 
         /// <summary>

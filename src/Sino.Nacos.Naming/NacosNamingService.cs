@@ -5,6 +5,7 @@ using Sino.Nacos.Naming.Model;
 using Sino.Nacos.Naming.Net;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -38,6 +39,47 @@ namespace Sino.Nacos.Naming
         private string GetGroupedName(string serviceName, string groupName)
         {
             return groupName + Constants.SERVICE_INFO_SPLITER + serviceName;
+        }
+
+        public async Task AutoRegister()
+        {
+            if (!_config.AutoRegister || string.IsNullOrEmpty(_config.IpPrefix))
+            {
+                throw new ArgumentNullException("the config autoRegister is false or ipPrefix is null");
+            }
+
+            if (string.IsNullOrEmpty(_config.ServiceName))
+            {
+                throw new ArgumentNullException("the config serviceName not null or empty");
+            }
+
+            var addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+            string ipAddress = "";
+            foreach(var addr in addresses)
+            {
+                if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    if (addr.ToString().StartsWith(_config.IpPrefix))
+                    {
+                        ipAddress = addr.ToString();
+                        break;
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(ipAddress))
+            {
+                throw new ArgumentNullException("no ip is match ipPrefix");
+            }
+
+            if (string.IsNullOrEmpty(_config.GroupName))
+            {
+                await RegisterInstance(_config.ServiceName, ipAddress, _config.Port);
+            }
+            else
+            {
+                await RegisterInstance(_config.ServiceName, _config.GroupName, ipAddress, _config.Port);
+            }
         }
 
         public BeatReactor GetBeatReactor()

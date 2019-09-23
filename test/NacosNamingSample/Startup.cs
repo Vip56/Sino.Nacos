@@ -36,6 +36,7 @@ namespace NacosNamingSample
             }
 
             app.UseMvc();
+            app.AutoRegisterNacosNaming();
         }
     }
 }

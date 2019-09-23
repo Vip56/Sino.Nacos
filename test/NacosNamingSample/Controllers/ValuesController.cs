@@ -26,8 +26,6 @@ namespace NacosNamingSample.Controllers
         [HttpGet("register")]
         public async Task<ActionResult<string>> Register()
         {
-            //var t = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-
             await _namingService.RegisterInstance("tms_order", new Instance()
             {
                 Ip = "192.168.2.1",
