@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Sino.Nacos.Config
+{
+    /// <summary>
+    /// 配置服务接口
+    /// </summary>
+    public interface IConfigService
+    {
+        /// <summary>
+        /// 获取配置
+        /// </summary>
+        /// <param name="dataId">数据编号</param>
+        /// <param name="group">分组</param>
+        /// <param name="timeout">超时时间，单位毫秒</param>
+        string GetConfig(string dataId, string group, long timeout);
+
+        /// <summary>
+        /// 获取并监听配置
+        /// </summary>
+        /// <param name="dataId">数据编号</param>
+        /// <param name="group">分组</param>
+        /// <param name="timeout">超时时间，单位毫秒</param>
+        /// <param name="listener">监听回调</param>
+        string GetConfigAndSignListener(string dataId, string group, long timeout, Action<string> listener);
+
+        /// <summary>
+        /// 监听配置
+        /// </summary>
+        /// <param name="dataId">数据编号</param>
+        /// <param name="group">分组</param>
+        /// <param name="listener">监听回调</param>
+        string AddListener(string dataId, string group, Action<string> listener);
+
+        /// <summary>
+        /// 发布配置
+        /// </summary>
+        /// <param name="dataId">数据编号</param>
+        /// <param name="group">分组</param>
+        /// <param name="content">配置内容</param>
+        bool PublishConfig(string dataId, string group, string content);
+
+        /// <summary>
+        /// 删除配置
+        /// </summary>
+        /// <param name="dataId">数据编号</param>
+        /// <param name="group">分组</param>
+        bool RemoveConfig(string dataId, string group);
+
+        /// <summary>
+        /// 删除监听
+        /// </summary>
+        /// <param name="dataId">数据编号</param>
+        /// <param name="group">分组</param>
+        /// <param name="listener">监听</param>
+        void RemoveListener(string dataId, string group, Action<string> listener);
+
+        /// <summary>
+        /// 获取服务状态
+        /// </summary>
+        string GetServerStatus();
+    }
+}
