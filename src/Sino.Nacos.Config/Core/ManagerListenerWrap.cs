@@ -6,16 +6,16 @@ namespace Sino.Nacos.Config.Core
 {
     public class ManagerListenerWrap
     {
-        private IListener _listener;
+        private Action<string> _listener;
         private string _lastCallmd5;
 
-        ManagerListenerWrap(IListener listener)
+        public ManagerListenerWrap(Action<string> listener)
         {
             _listener = listener;
             _lastCallmd5 = null;
         }
 
-        ManagerListenerWrap(IListener listener, string md5)
+        public ManagerListenerWrap(Action<string> listener, string md5)
         {
             _listener = listener;
             _lastCallmd5 = md5;
