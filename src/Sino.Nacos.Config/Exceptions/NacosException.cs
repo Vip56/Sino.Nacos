@@ -38,5 +38,30 @@ namespace Sino.Nacos.Config.Exceptions
         {
             return $"ErrCode:{ErrorCode},ErrMsg:{ErrorMsg}";
         }
+
+        /// <summary>
+        /// 参数错误
+        /// </summary>
+        public const int CLIENT_INVALID_PARAM = -400;
+
+        /// <summary>
+        /// 超过Server端的限流阈值
+        /// </summary>
+        public const int CLIENT_OVER_THRESHOLD = -503;
+
+        /// <summary>
+        /// 参数错误
+        /// </summary>
+        public const int INVALID_PARAM = 400;
+
+        /// <summary>
+        /// 鉴权失败
+        /// </summary>
+        public const int NO_RIGHT = 403;
+
+        /// <summary>
+        /// 写并发冲突
+        /// </summary>
+        public const int CONFLICT = 409;
     }
 }
