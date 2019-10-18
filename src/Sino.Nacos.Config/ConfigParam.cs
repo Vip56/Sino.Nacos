@@ -30,5 +30,11 @@ namespace Sino.Nacos.Config
         /// 提供Nacos服务地址的地址
         /// </summary>
         public string EndPoint { get; set; }
+
+        public string AccessKey { get; set; }
+
+        public string SecretKey { get; set; }
+
+        public long ConnectionTimeout { get; set; }
     }
 }

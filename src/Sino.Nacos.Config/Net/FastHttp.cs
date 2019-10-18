@@ -16,20 +16,22 @@ namespace Sino.Nacos.Config.Net
     public class FastHttp
     {
         private IHttpClientFactory _httpClientFactory;
+        private ConfigParam _config;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public FastHttp(IHttpClientFactory httpClientFactory)
+        public FastHttp(IHttpClientFactory httpClientFactory, ConfigParam config)
         {
             _httpClientFactory = httpClientFactory;
+            _config = config;
         }
 
-        public async Task<string> Request(string url, Dictionary<string, string> headers, Dictionary<string, string> paramValues, Encoding encoding, HttpMethod method, int timeout)
+        public async Task<string> Request(string url, Dictionary<string, string> headers, Dictionary<string, string> paramValues, Encoding encoding, HttpMethod method)
         {
             var client = _httpClientFactory.CreateClient();
 
-            if (client.Timeout.TotalMilliseconds != timeout)
-                client.Timeout = TimeSpan.FromMilliseconds(timeout);
+            if (client.Timeout.TotalMilliseconds != _config.ConnectionTimeout)
+                client.Timeout = TimeSpan.FromMilliseconds(_config.ConnectionTimeout);
 
             HttpRequestMessage requestMessage = new HttpRequestMessage();
             requestMessage.Method = method;
