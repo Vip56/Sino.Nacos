@@ -6,19 +6,20 @@ namespace Sino.Nacos.Config.Core
 {
     public class ManagerListenerWrap
     {
-        private Action<string> _listener;
-        private string _lastCallmd5;
+        public string LastCallMD5 { get; set; }
+
+        public Action<string> Listener { get; private set; }
 
         public ManagerListenerWrap(Action<string> listener)
         {
-            _listener = listener;
-            _lastCallmd5 = null;
+            Listener = listener;
+            LastCallMD5 = null;
         }
 
         public ManagerListenerWrap(Action<string> listener, string md5)
         {
-            _listener = listener;
-            _lastCallmd5 = md5;
+            Listener = listener;
+            LastCallMD5 = md5;
         }
 
         public override bool Equals(object obj)
@@ -29,7 +30,7 @@ namespace Sino.Nacos.Config.Core
                 return true;
 
             var other = obj as ManagerListenerWrap;
-            return _listener.Equals(other._listener);
+            return Listener.Equals(other.LastCallMD5);
         }
     }
 }

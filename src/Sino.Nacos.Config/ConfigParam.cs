@@ -36,5 +36,10 @@ namespace Sino.Nacos.Config
         public string SecretKey { get; set; }
 
         public long ConnectionTimeout { get; set; }
+
+        /// <summary>
+        /// 配置缓存文件根路径
+        /// </summary>
+        public string LocalFileRoot { get; set; }
     }
 }
