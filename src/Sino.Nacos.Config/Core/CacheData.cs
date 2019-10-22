@@ -9,8 +9,6 @@ namespace Sino.Nacos.Config.Core
 {
     public class CacheData
     {
-        public const string DEFAULT_TENANT_ID = "nacosconfig";
-
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _content;
@@ -23,8 +21,6 @@ namespace Sino.Nacos.Config.Core
         public string DataId { get; set; }
         public string Group { get; set; }
         public string Tenant { get; set; }
-
-        public bool Initializing { get; set; }
 
         public string MD5 { get; private set; }
 
@@ -84,7 +80,7 @@ namespace Sino.Nacos.Config.Core
             _localConfigInfoProcessor = localConfigInfoProcessor;
             DataId = dataId;
             Group = group;
-            Tenant = DEFAULT_TENANT_ID;
+            Tenant = Constants.DEFAULT_TENANT_ID;
             _listeners = new ConcurrentList<ManagerListenerWrap>();
             IsInitializing = true;
             Content = LoadCacheContentFromDiskLocal(name, dataId, group, Tenant);
