@@ -9,6 +9,8 @@ namespace Sino.Nacos.Config.Core
 {
     public class CacheData
     {
+        public const string DEFAULT_TENANT_ID = "nacosconfig";
+
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _content;
@@ -16,6 +18,7 @@ namespace Sino.Nacos.Config.Core
         private string _name;
         private bool _isUseLocalConfig;
         private ConfigFilterChainManager _configFilterChainManager;
+        private LocalConfigInfoProcessor _localConfigInfoProcessor;
 
         public string DataId { get; set; }
         public string Group { get; set; }
@@ -46,6 +49,11 @@ namespace Sino.Nacos.Config.Core
         public int TaskId { get; set; }
 
         /// <summary>
+        /// 是否已初始化
+        /// </summary>
+        public bool IsInitializing { get; set; }
+
+        /// <summary>
         /// 是否启用本地配置
         /// </summary>
         public bool IsUseLocalConfig
@@ -62,6 +70,44 @@ namespace Sino.Nacos.Config.Core
                     LocalConfigLastModified = -1;
                 }
             }
+        }
+
+        public CacheData(ConfigFilterChainManager configFilterChainManager, LocalConfigInfoProcessor localConfigInfoProcessor, string name, string dataId, string group)
+        {
+            if (string.IsNullOrEmpty(dataId))
+                throw new ArgumentNullException(nameof(dataId));
+            if (string.IsNullOrEmpty(group))
+                throw new ArgumentNullException(nameof(group));
+
+            _name = name;
+            _configFilterChainManager = configFilterChainManager;
+            _localConfigInfoProcessor = localConfigInfoProcessor;
+            DataId = dataId;
+            Group = group;
+            Tenant = DEFAULT_TENANT_ID;
+            _listeners = new ConcurrentList<ManagerListenerWrap>();
+            IsInitializing = true;
+            Content = LoadCacheContentFromDiskLocal(name, dataId, group, Tenant);
+            MD5 = GetMD5String(Content);
+        }
+
+        public CacheData(ConfigFilterChainManager configFilterChainManager, LocalConfigInfoProcessor localConfigInfoProcessor, string name, string dataId, string group, string tenant)
+        {
+            if (string.IsNullOrEmpty(dataId))
+                throw new ArgumentNullException(nameof(dataId));
+            if (string.IsNullOrEmpty(group))
+                throw new ArgumentNullException(nameof(group));
+
+            _name = name;
+            _configFilterChainManager = configFilterChainManager;
+            _localConfigInfoProcessor = localConfigInfoProcessor;
+            DataId = dataId;
+            Group = group;
+            Tenant = tenant;
+            _listeners = new ConcurrentList<ManagerListenerWrap>();
+            IsInitializing = true;
+            Content = LoadCacheContentFromDiskLocal(name, dataId, group, tenant);
+            MD5 = GetMD5String(Content);
         }
 
         /// <summary>
@@ -138,6 +184,19 @@ namespace Sino.Nacos.Config.Core
             listenerWrap.LastCallMD5 = md5;
 
             _logger.Info($"[{_name}] [notify-ok] dataId={dataId}, group={group}, md5={md5}");
+        }
+
+        /// <summary>
+        /// 从磁盘本地读取缓存内容
+        /// </summary>
+        private string LoadCacheContentFromDiskLocal(string name, string dataId, string group, string tenant)
+        {
+            string content = _localConfigInfoProcessor.GetFailover(name, dataId, group, tenant);
+            if (string.IsNullOrEmpty(content))
+            {
+                content = _localConfigInfoProcessor.GetSnapshot(name, dataId, group, tenant);
+            }
+            return content;
         }
 
         public override int GetHashCode()

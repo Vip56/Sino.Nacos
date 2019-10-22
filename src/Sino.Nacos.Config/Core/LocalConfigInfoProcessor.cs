@@ -12,6 +12,7 @@ namespace Sino.Nacos.Config.Core
 
         private string _localFileRootPath;
         private string _localSnapshotPath;
+        private bool _isSnapshot = true;
 
         public LocalConfigInfoProcessor(ConfigParam config)
         {
@@ -20,6 +21,116 @@ namespace Sino.Nacos.Config.Core
 
             _localFileRootPath = Path.Combine(config.LocalFileRoot, "/nacos/config");
             _localSnapshotPath = Path.Combine(config.LocalFileRoot, "/nacos/config");
+        }
+
+        /// <summary>
+        /// 是否启用缓存
+        /// </summary>
+        public bool IsSnapshot
+        {
+            get
+            {
+                return _isSnapshot;
+            }
+            set
+            {
+                _isSnapshot = value;
+                CleanAllSnapshot();
+            }
+        }
+
+        /// <summary>
+        /// 获取灾备文件
+        /// </summary>
+        public string GetFailover(string serverName, string dataId, string group, string tenant)
+        {
+            string file = GetFailoverFile(serverName, dataId, group, tenant);
+            if (!File.Exists(file))
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                return ReadFile(file);
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex, $"[{serverName}] get failover error, {file}");
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 获取缓存
+        /// </summary>
+        public string GetSnapshot(string envName, string dataId, string group, string tenant)
+        {
+            if (!IsSnapshot)
+            {
+                return string.Empty;
+            }
+
+            string file = GetSnapshotPath(envName, dataId, group, tenant);
+
+            if (!File.Exists(file))
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                return ReadFile(file);
+            }
+            catch(Exception ex)
+            {
+                _logger.Error(ex, $"[{envName}] get snapshot error, {file}");
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// 保存缓存
+        /// </summary>
+        public void SaveSnapshot(string envName, string dataId, string group, string tenant, string config)
+        {
+            if (!IsSnapshot)
+            {
+                return;
+            }
+
+            string file = GetSnapshotPath(envName, dataId, group, tenant);
+
+            if (string.IsNullOrEmpty(config))
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, $"[{envName}] delete snapshot error, {file}");
+                }
+            }
+            else
+            {
+                try
+                {
+                    FileInfo info = new FileInfo(file);
+                    if (!info.Directory.Exists)
+                    {
+                        info.Directory.Create();
+                    }
+
+                    WriteFile(file, config);
+                }
+                catch(Exception ex)
+                {
+                    _logger.Error(ex, $"[{envName}] save snapshot error, {file}");
+                }
+            }
         }
 
         /// <summary>
@@ -99,6 +210,28 @@ namespace Sino.Nacos.Config.Core
             }
 
             return Path.Combine(tmp, group, dataId);
+        }
+
+        private void WriteFile(string path, string content)
+        {
+            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite, 1024, false))
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(content);
+                fs.Write(bytes, 0, bytes.Length);
+                fs.Close();
+            }
+        }
+
+        private string ReadFile(string path)
+        {
+            using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 1024, false))
+            {
+                byte[] readByte = new byte[fs.Length];
+                fs.Read(readByte, 0, readByte.Length);
+                string readStr = Encoding.UTF8.GetString(readByte);
+                fs.Close();
+                return readStr;
+            }
         }
     }
 }
