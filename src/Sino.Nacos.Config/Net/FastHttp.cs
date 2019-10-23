@@ -68,6 +68,10 @@ namespace Sino.Nacos.Config.Net
                     var responseStr = await response.Content.ReadAsStringAsync();
                     return responseStr;
                 }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return string.Empty;
+                }
                 else
                 {
                     _logger.Warn($"Error while requesting: {requestMessage.RequestUri.ToString()}. Server returned: {response.StatusCode}");

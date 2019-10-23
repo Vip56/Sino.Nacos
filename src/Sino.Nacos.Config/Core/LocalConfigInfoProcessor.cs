@@ -44,7 +44,7 @@ namespace Sino.Nacos.Config.Core
         /// </summary>
         public string GetFailover(string serverName, string dataId, string group, string tenant)
         {
-            string file = GetFailoverFile(serverName, dataId, group, tenant);
+            string file = GetFailoverPath(serverName, dataId, group, tenant);
             if (!File.Exists(file))
             {
                 return string.Empty;
@@ -180,7 +180,7 @@ namespace Sino.Nacos.Config.Core
         /// <summary>
         /// 获取灾备路径
         /// </summary>
-        private string GetFailoverFile(string serverName, string dataId, string group, string tenant)
+        public string GetFailoverPath(string serverName, string dataId, string group, string tenant)
         {
             string tmp = Path.Combine(_localSnapshotPath, serverName, "_nacos", "data");
             if (string.IsNullOrEmpty(tenant))
@@ -197,7 +197,7 @@ namespace Sino.Nacos.Config.Core
         /// <summary>
         /// 获取缓存路径
         /// </summary>
-        private string GetSnapshotPath(string envName, string dataId, string group, string tenant)
+        public string GetSnapshotPath(string envName, string dataId, string group, string tenant)
         {
             string tmp = Path.Combine(_localSnapshotPath, envName, "_nacos");
             if (string.IsNullOrEmpty(tenant))

@@ -63,5 +63,10 @@ namespace Sino.Nacos.Config.Exceptions
         /// 写并发冲突
         /// </summary>
         public const int CONFLICT = 409;
+
+        /// <summary>
+        /// 服务器错误
+        /// </summary>
+        public const int SERVER_ERROR = 500;
     }
 }
