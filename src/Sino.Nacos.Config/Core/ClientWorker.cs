@@ -10,6 +10,7 @@ using Sino.Nacos.Config.Exceptions;
 using System.Threading.Tasks;
 using System.IO;
 using Sino.Nacos.Config.Utils;
+using System.Net;
 
 namespace Sino.Nacos.Config.Core
 {
@@ -26,6 +27,9 @@ namespace Sino.Nacos.Config.Core
         private IHttpAgent _agent;
         private bool _enableRemoteSyncConfig = false;
         private double _currentLongingTaskCount = 0;
+        private long _timeout;
+
+        public bool IsHealthServer { get; set; }
 
         public void AddListeners(string dataId, string group, IList<Action<string>> listeners)
         {
@@ -203,7 +207,88 @@ namespace Sino.Nacos.Config.Core
         private IList<string> CheckUpdateDataIds(IList<CacheData> cacheDatas, IList<string> inInitializingCacheList)
         {
             StringBuilder sb = new StringBuilder();
+            foreach(var cacheData in cacheDatas)
+            {
+                if(!cacheData.IsUseLocalConfig)
+                {
 
+                }
+            }
+            bool isInitializingCacheList = inInitializingCacheList.Count >= 0;
+            
+        }
+
+        private async Task<IList<string>> CheckUpdateConfigStr(string probeUpdateString, bool isInitializingCacheList)
+        {
+            var paramValues = new Dictionary<string, string>();
+            paramValues.Add(Constants.PROBE_MODIFY_REQUEST, probeUpdateString);
+
+            var headers = new Dictionary<string, string>();
+            headers.Add("Long-Pulling-Timeout", _timeout.ToString());
+
+            if (isInitializingCacheList)
+            {
+                headers.Add("Long-Pulling-Timeout-No-Hangup", "true");
+            }
+
+            if (string.IsNullOrEmpty(probeUpdateString))
+            {
+                return null;
+            }
+
+            try
+            {
+                string result = await _agent.Post(Constants.CONFIG_CONTROLLER_PATH + "/listener", headers, paramValues);
+
+                if (string.IsNullOrEmpty(result))
+                {
+                    IsHealthServer = false;
+                    _logger.Error($"[{_agent.GetName()}] [check-update] get changed dataId error.");
+                }
+                else
+                {
+                    IsHealthServer = true;
+                    return ParseUpdateDataIdResponse(result);
+                }
+            }
+            catch(Exception ex)
+            {
+                IsHealthServer = false;
+                _logger.Error(ex, $"[{_agent.GetName()}] [check-update] get changed dataId exception");
+                throw ex;
+            }
+            return null;
+        }
+
+        private IList<string> ParseUpdateDataIdResponse(string response)
+        {
+            if (string.IsNullOrEmpty(response))
+            {
+                return null;
+            }
+
+            response = WebUtility.UrlDecode(response);
+
+            var updateList = new List<string>();
+
+            foreach(string dataIdAndGroup in response.Split(Constants.LINE_SEPARATOR))
+            {
+                if (!string.IsNullOrEmpty(dataIdAndGroup))
+                {
+                    var keyArr = dataIdAndGroup.Split(Constants.WORD_SEPARATOR);
+                    string dataId = keyArr[0];
+                    string group = keyArr[1];
+                    if (keyArr.Length == 2)
+                    {
+                        updateList.Add(GroupKey.GetKey(dataId, group));
+                        _logger.Info($"[{_agent.GetName()}] [polling-resp] config changed. dataId={dataId}, group={group}");
+                    }
+                    else if(keyArr.Length == 3)
+                    {
+
+                    }
+                }
+            }
         }
     }
 }
