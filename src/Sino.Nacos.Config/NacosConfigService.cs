@@ -1,4 +1,5 @@
 ﻿using NLog;
+using Sino.Nacos.Config.Net;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,6 +11,8 @@ namespace Sino.Nacos.Config
         public static long POST_TIMEOUT = 3000L;
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
+        private IHttpAgent _agent;
 
         public string AddListener(string dataId, string group, Action<string> listener)
         {
