@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sino.Nacos.Config
 {
@@ -14,8 +15,7 @@ namespace Sino.Nacos.Config
         /// </summary>
         /// <param name="dataId">数据编号</param>
         /// <param name="group">分组</param>
-        /// <param name="timeout">超时时间，单位毫秒</param>
-        string GetConfig(string dataId, string group, long timeout);
+        Task<string> GetConfig(string dataId, string group);
 
         /// <summary>
         /// 获取并监听配置
@@ -24,7 +24,7 @@ namespace Sino.Nacos.Config
         /// <param name="group">分组</param>
         /// <param name="timeout">超时时间，单位毫秒</param>
         /// <param name="listener">监听回调</param>
-        string GetConfigAndSignListener(string dataId, string group, long timeout, Action<string> listener);
+        Task<string> GetConfigAndSignListener(string dataId, string group, long timeout, Action<string> listener);
 
         /// <summary>
         /// 监听配置
@@ -32,7 +32,7 @@ namespace Sino.Nacos.Config
         /// <param name="dataId">数据编号</param>
         /// <param name="group">分组</param>
         /// <param name="listener">监听回调</param>
-        string AddListener(string dataId, string group, Action<string> listener);
+        Task AddListener(string dataId, string group, Action<string> listener);
 
         /// <summary>
         /// 发布配置

@@ -1,8 +1,13 @@
 ﻿using NLog;
+using Sino.Nacos.Config.Core;
+using Sino.Nacos.Config.Filter;
 using Sino.Nacos.Config.Net;
+using Sino.Nacos.Config.Utils;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sino.Nacos.Config
 {
@@ -12,21 +17,76 @@ namespace Sino.Nacos.Config
 
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        private string _namespace;
         private IHttpAgent _agent;
+        private ClientWorker _worker;
+        private FastHttp _http;
+        private ConfigFilterChainManager _configFilterChainManager = new ConfigFilterChainManager();
+        private LocalConfigInfoProcessor _localConfigInfoProcessor;
 
-        public string AddListener(string dataId, string group, Action<string> listener)
+        public NacosConfigService(ConfigParam config, IHttpClientFactory factory)
         {
-            throw new NotImplementedException();
+            _namespace = config.Namespace;
+            _http = new FastHttp(factory, config);
+            _agent = new ServerHttpAgent(config, _http);
+            _localConfigInfoProcessor = new LocalConfigInfoProcessor(config);
+            _worker = new ClientWorker(config, _agent, _configFilterChainManager, _localConfigInfoProcessor);
         }
 
-        public string GetConfig(string dataId, string group, long timeout)
+        public Task AddListener(string dataId, string group, Action<string> listener)
         {
-            throw new NotImplementedException();
+            return _worker.AddTenantListeners(dataId, group, listener);
         }
 
-        public string GetConfigAndSignListener(string dataId, string group, long timeout, Action<string> listener)
+        public async Task<string> GetConfig(string dataId, string group)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(dataId))
+                throw new ArgumentNullException(nameof(dataId));
+
+            group = Null2DefaultGroup(group);
+
+            ConfigResponse cr = new ConfigResponse();
+            cr.DataId = dataId;
+            cr.Tenant = _namespace;
+            cr.Group = group;
+
+            // 先使用本地缓存
+            string content = _localConfigInfoProcessor.GetFailover(_agent.GetName(), dataId, group, _namespace);
+            if (!string.IsNullOrEmpty(content))
+            {
+                _logger.Warn($"[{_agent.GetName()}] [get-config] get failover ok, dataId={dataId}, group={group}, tenant={_namespace}, config={ContentUtils.TruncateContent(content)}");
+                cr.Content = content;
+                _configFilterChainManager.DoFilter(null, cr);
+                content = cr.Content;
+                return content;
+            }
+
+            try
+            {
+                content = await _worker.GetServerConfig(dataId, group, _namespace);
+                cr.Content = content;
+                _configFilterChainManager.DoFilter(null, cr);
+                content = cr.Content;
+                return content;
+            }
+            catch(Exception ex)
+            {
+                _logger.Warn(ex, $"[{_agent.GetName()}] [get-config] get from server error, dataId={dataId}, group={group}, tenant={_namespace}");
+            }
+
+            _logger.Warn($"[{_agent.GetName()}] [get-config] get snapshot ok, dataId={dataId}, tenant={_namespace}, config={ContentUtils.TruncateContent(content)}");
+            content = _localConfigInfoProcessor.GetSnapshot(_agent.GetName(), dataId, group, _namespace);
+            cr.Content = content;
+            _configFilterChainManager.DoFilter(null, cr);
+            content = cr.Content;
+            return content;
+        }
+
+        public async Task<string> GetConfigAndSignListener(string dataId, string group, long timeout, Action<string> listener)
+        {
+            string content = await GetConfig(dataId, group);
+            await _worker.AddTenantListenersWithContent(dataId, group, content, listener);
+            return content;
         }
 
         public string GetServerStatus()
@@ -47,6 +107,11 @@ namespace Sino.Nacos.Config
         public void RemoveListener(string dataId, string group, Action<string> listener)
         {
             throw new NotImplementedException();
+        }
+
+        private string Null2DefaultGroup(string group)
+        {
+            return string.IsNullOrEmpty(group) ? Constants.DEFAULT_GROUP : group.Trim();
         }
     }
 }

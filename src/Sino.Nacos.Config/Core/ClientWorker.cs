@@ -63,14 +63,62 @@ namespace Sino.Nacos.Config.Core
             _enableRemoteSyncConfig = config.EnableRemoteSyncConfig;
         }
 
-        public void AddListeners(string dataId, string group, IList<Action<string>> listeners)
+        public void AddListeners(string dataId, string group, Action<string> listener)
         {
             group = Null2DefaultGroup(group);
+            var cache = AddCacheDataIfAbsent(dataId, group);
+            cache.AddListener(listener);
+        }
+
+        public void RemoveListener(string dataId, string group, Action<string> listener)
+        {
+            group = Null2DefaultGroup(group);
+            var cache = GetCache(dataId, group);
+            if (cache != null)
+            {
+                cache.RemoveListener(listener);
+                if (cache.GetListeners().Count <= 0)
+                {
+                    RemoveCache(dataId, group);
+                }
+            }
+        }
+
+        public async Task AddTenantListeners(string dataId, string group, Action<string> listener)
+        {
+            group = Null2DefaultGroup(group);
+            string tenant = _agent.GetTenant();
+            var cache = await AddCacheDataIfAbsent(dataId, group, tenant);
+            cache.AddListener(listener);
+        }
+
+        public async Task AddTenantListenersWithContent(string dataId, string group, string content, Action<string> listener)
+        {
+            group = Null2DefaultGroup(group);
+            string tenant = _agent.GetTenant();
+            var cache = await AddCacheDataIfAbsent(dataId, group, tenant);
+            cache.Content = content;
+            cache.AddListener(listener);
+        }
+
+        public void RemoveTenantListener(string dataId, string group, Action<string> listener)
+        {
+            group = Null2DefaultGroup(group);
+            string tenant = _agent.GetTenant();
+            var cache = GetCache(dataId, group, tenant);
+            if (cache != null)
+            {
+                cache.RemoveListener(listener);
+                if (cache.GetListeners().Count <= 0)
+                {
+                    RemoveCache(dataId, group, tenant);
+                }
+            }
         }
 
         public CacheData AddCacheDataIfAbsent(string dataId, string group)
         {
-            var cache = GetCache(dataId, group);
+            CacheData cache = GetCache(dataId, group);
             if (cache != null)
                 return cache;
 
@@ -155,6 +203,24 @@ namespace Sino.Nacos.Config.Core
                 _logger.Error(ex, $"[{_agent.GetName()}] [sub-server] get server config exception, dataId={dataId}, group={group}, tenant={tenant}");
                 throw new NacosException(NacosException.SERVER_ERROR, ex);
             }
+        }
+
+        private void RemoveCache(string dataId, string group)
+        {
+            string groupKey = GroupKey.GetKey(dataId, group);
+            CacheData cache;
+            _cacheMap.TryRemove(groupKey, out cache);
+
+            _logger.Info($"[{_agent.GetName()}] [unsubscribe] {groupKey}");
+        }
+
+        private void RemoveCache(string dataId, string group, string tenant)
+        {
+            string groupKey = GroupKey.GetKeyTenant(dataId, group, tenant);
+            CacheData cache;
+            _cacheMap.TryRemove(groupKey, out cache);
+
+            _logger.Info($"[{_agent.GetName()}] [unsubscribe] {groupKey}");
         }
 
         /// <summary>
