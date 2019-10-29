@@ -13,8 +13,6 @@ namespace Sino.Nacos.Config
 {
     public class NacosConfigService : IConfigService
     {
-        public static long POST_TIMEOUT = 3000L;
-
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _namespace;
