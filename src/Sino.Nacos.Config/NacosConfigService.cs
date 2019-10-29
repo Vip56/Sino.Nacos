@@ -91,22 +91,127 @@ namespace Sino.Nacos.Config
 
         public string GetServerStatus()
         {
-            throw new NotImplementedException();
+            if (_worker.IsHealthServer)
+            {
+                return "UP";
+            }
+            else
+            {
+                return "DOWN";
+            }
         }
 
-        public bool PublishConfig(string dataId, string group, string content)
+        public Task<bool> PublishConfig(string dataId, string group, string content)
         {
-            throw new NotImplementedException();
+            return PublishConfigInner(_namespace, dataId, group, null, null, null, content);
         }
 
-        public bool RemoveConfig(string dataId, string group)
+        public Task<bool> RemoveConfig(string dataId, string group)
         {
-            throw new NotImplementedException();
+            return RemoveConfigInner(_namespace, dataId, group, null);
         }
 
         public void RemoveListener(string dataId, string group, Action<string> listener)
         {
-            throw new NotImplementedException();
+            _worker.RemoveTenantListener(dataId, group, listener);
+        }
+
+        private async Task<bool> PublishConfigInner(string tenant, string dataId, string group, string tag, 
+            string appName, string betaIps, string content)
+        {
+            if (string.IsNullOrEmpty(dataId))
+                throw new ArgumentNullException(nameof(dataId));
+            if (string.IsNullOrEmpty(content))
+                throw new ArgumentNullException(nameof(content));
+
+            group = Null2DefaultGroup(group);
+
+            ConfigRequest cr = new ConfigRequest();
+            cr.DataId = dataId;
+            cr.Tenant = tenant;
+            cr.Group = group;
+            cr.Content = content;
+            _configFilterChainManager.DoFilter(cr, null);
+            content = cr.Content;
+
+            string url = Constants.CONFIG_CONTROLLER_PATH;
+            var paramValue = new Dictionary<string, string>();
+            paramValue.Add("dataId", dataId);
+            paramValue.Add("group", group);
+            paramValue.Add("content", content);
+
+            if (!string.IsNullOrEmpty(tenant))
+            {
+                paramValue.Add("tenant", tenant);
+            }
+            if (!string.IsNullOrEmpty(appName))
+            {
+                paramValue.Add("appName", appName);
+            }
+            if (string.IsNullOrEmpty(tag))
+            {
+                paramValue.Add("tag", tag);
+            }
+
+            var headers = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(betaIps))
+            {
+                headers.Add("betaIps", betaIps);
+            }
+
+            try
+            {
+                string result = await _agent.Post(url, headers, paramValue);
+                if (string.IsNullOrEmpty(result))
+                {
+                    _logger.Warn($"[{_agent.GetName()}] [publish-single] error, dataId={dataId}, group={group}, tenant={tenant}");
+                    return false;
+                }
+                _logger.Info($"[{_agent.GetName()}] [publish-single] ok, dataId={dataId}, group={group}, tenant={tenant}, config={ContentUtils.TruncateContent(content)}");
+                return true;
+            }
+            catch(Exception ex)
+            {
+                _logger.Warn(ex, $"[{_agent.GetName()}] [publish-single] error, dataId={dataId}, group={group}, tenant={tenant}");
+                return false;
+            }
+        }
+
+        private async Task<bool> RemoveConfigInner(string tenant, string dataId, string group, string tag)
+        {
+            if (string.IsNullOrEmpty(dataId))
+                throw new ArgumentNullException(nameof(dataId));
+
+            group = Null2DefaultGroup(group);
+            string url = Constants.CONFIG_CONTROLLER_PATH;
+            var paramValue = new Dictionary<string, string>();
+            paramValue.Add("dataId", dataId);
+            paramValue.Add("group", group);
+            if (!string.IsNullOrEmpty(tenant))
+            {
+                paramValue.Add("tenant", tenant);
+            }
+            if (!string.IsNullOrEmpty(tag))
+            {
+                paramValue.Add("tag", tag);
+            }
+
+            try
+            {
+                string result = await _agent.Delete(url, null, paramValue);
+                if (string.IsNullOrEmpty(result))
+                {
+                    _logger.Warn($"[{_agent.GetName()}] [remove] error, dataId={dataId}, group={group}, tenant={tenant}");
+                    return false;
+                }
+                _logger.Info($"[{_agent.GetName()}] [remove] ok, dataId={dataId}, group={group}, tenant={tenant}");
+                return true;
+            }
+            catch(Exception ex)
+            {
+                _logger.Warn(ex, $"[{_agent.GetName()}] [remove] ok, dataId={dataId}, group={group}, tenant={tenant}");
+                return false;
+            }
         }
 
         private string Null2DefaultGroup(string group)

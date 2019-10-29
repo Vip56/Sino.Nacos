@@ -40,14 +40,14 @@ namespace Sino.Nacos.Config
         /// <param name="dataId">数据编号</param>
         /// <param name="group">分组</param>
         /// <param name="content">配置内容</param>
-        bool PublishConfig(string dataId, string group, string content);
+        Task<bool> PublishConfig(string dataId, string group, string content);
 
         /// <summary>
         /// 删除配置
         /// </summary>
         /// <param name="dataId">数据编号</param>
         /// <param name="group">分组</param>
-        bool RemoveConfig(string dataId, string group);
+        Task<bool> RemoveConfig(string dataId, string group);
 
         /// <summary>
         /// 删除监听
