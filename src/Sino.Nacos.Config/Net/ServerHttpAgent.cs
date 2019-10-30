@@ -45,6 +45,7 @@ namespace Sino.Nacos.Config.Net
         {
             _config = config;
             _http = http;
+            Init(config);
         }
 
         private void Init(ConfigParam config)
@@ -60,7 +61,7 @@ namespace Sino.Nacos.Config.Net
             {
                 if (string.IsNullOrEmpty(config.Namespace))
                 {
-                    _name = $"{FIXED_NAME}-{GetFixedNameSuffix(_serverList)}";
+                    _name = $"{FIXED_NAME}-{GetFixedNameSuffix(          )}";
                 }
                 else
                 {
@@ -97,6 +98,8 @@ namespace Sino.Nacos.Config.Net
             }
             return sb.ToString();
         }
+
+        #region 从特定节点获取Nacos服务器列表
 
         /// <summary>
         /// 只有当EndPoint填写后内部代码有效
@@ -180,6 +183,8 @@ namespace Sino.Nacos.Config.Net
 
             return null;
         }
+
+        #endregion
 
         private Task<string> ReqApi(string api, Dictionary<string, string> headers, Dictionary<string, string> paramValue, HttpMethod httpMethod)
         {
