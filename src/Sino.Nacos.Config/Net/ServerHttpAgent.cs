@@ -52,7 +52,7 @@ namespace Sino.Nacos.Config.Net
         {
             _serverList = config.ServerAddr;
             _endpoint = config.EndPoint;
-            if (_serverList != null || _serverList.Count == 1)
+            if (_serverList != null && _serverList.Count == 1)
             {
                 _nacosDomain = _serverList.First();
             }
@@ -61,7 +61,7 @@ namespace Sino.Nacos.Config.Net
             {
                 if (string.IsNullOrEmpty(config.Namespace))
                 {
-                    _name = $"{FIXED_NAME}-{GetFixedNameSuffix(          )}";
+                    _name = $"{FIXED_NAME}-{GetFixedNameSuffix(_serverList)}";
                 }
                 else
                 {
@@ -82,7 +82,7 @@ namespace Sino.Nacos.Config.Net
                 }
             }
 
-            InitRefreshSrvIfNeed().Wait();
+            InitRefreshSrvIfNeed();
         }
 
         private string GetFixedNameSuffix(IList<string> serverIps)
@@ -104,7 +104,7 @@ namespace Sino.Nacos.Config.Net
         /// <summary>
         /// 只有当EndPoint填写后内部代码有效
         /// </summary>
-        private async Task InitRefreshSrvIfNeed()
+        private void InitRefreshSrvIfNeed()
         {
             if (string.IsNullOrEmpty(_endpoint))
             {
@@ -114,9 +114,9 @@ namespace Sino.Nacos.Config.Net
             Timer t = new Timer(async x =>
             {
                 await RefreshSrvIfNeed();
-            }, null, 0, _vipSrvRefInterMillis);
+            }, null, _vipSrvRefInterMillis, _vipSrvRefInterMillis);
 
-            await RefreshSrvIfNeed();
+            RefreshSrvIfNeed().Wait();
         }
 
         /// <summary>
