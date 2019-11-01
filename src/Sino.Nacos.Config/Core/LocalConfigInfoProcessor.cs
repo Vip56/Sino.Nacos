@@ -10,7 +10,6 @@ namespace Sino.Nacos.Config.Core
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        private string _localFileRootPath;
         private string _localSnapshotPath;
         private bool _isSnapshot = true;
 
@@ -19,8 +18,7 @@ namespace Sino.Nacos.Config.Core
             if (string.IsNullOrEmpty(config.LocalFileRoot))
                 throw new ArgumentNullException(nameof(config.LocalFileRoot));
 
-            _localFileRootPath = Path.Combine(config.LocalFileRoot, "/nacos/config");
-            _localSnapshotPath = Path.Combine(config.LocalFileRoot, "/nacos/config");
+            _localSnapshotPath = Path.Combine(config.LocalFileRoot, "nacos", "config");
         }
 
         /// <summary>
