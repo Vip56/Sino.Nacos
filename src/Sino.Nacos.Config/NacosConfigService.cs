@@ -27,7 +27,7 @@ namespace Sino.Nacos.Config
             _namespace = config.Namespace;
             _http = new FastHttp(factory, config);
             _agent = new ServerHttpAgent(config, _http);
-            _localConfigInfoProcessor = new LocalConfigInfoProcessor(config);
+            _localConfigInfoProcessor = new LocalConfigInfoProcessor(config.LocalFileRoot);
             _worker = new ClientWorker(config, _agent, _configFilterChainManager, _localConfigInfoProcessor);
         }
 

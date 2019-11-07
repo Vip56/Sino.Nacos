@@ -8,17 +8,19 @@ namespace Sino.Nacos.Config.Core
 {
     public class LocalConfigInfoProcessor
     {
+        public const string SnapshotPath = "nacos";
+
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         private string _localSnapshotPath;
         private bool _isSnapshot = true;
 
-        public LocalConfigInfoProcessor(ConfigParam config)
+        public LocalConfigInfoProcessor(string localFileDir)
         {
-            if (string.IsNullOrEmpty(config.LocalFileRoot))
-                throw new ArgumentNullException(nameof(config.LocalFileRoot));
+            if (string.IsNullOrEmpty(localFileDir))
+                throw new ArgumentNullException(nameof(localFileDir));
 
-            _localSnapshotPath = Path.Combine(config.LocalFileRoot, "nacos", "config");
+            _localSnapshotPath = Path.Combine(localFileDir, SnapshotPath, "config");
         }
 
         /// <summary>
