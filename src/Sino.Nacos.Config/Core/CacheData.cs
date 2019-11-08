@@ -160,7 +160,7 @@ namespace Sino.Nacos.Config.Core
         {
             foreach(var wrap in _listeners.ToArray())
             {
-                if (!MD5.Equals(wrap.LastCallMD5))
+                if (MD5 != wrap.LastCallMD5)
                 {
                     SafeNotifyListener(DataId, Group, Content, MD5, wrap);
                 }

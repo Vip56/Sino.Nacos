@@ -24,13 +24,18 @@ namespace Sino.Nacos.Config.Core
 
         public override bool Equals(object obj)
         {
-            if (null == obj || obj.GetType() == this.GetType())
+            if (null == obj || obj.GetType() != this.GetType())
                 return false;
             if (obj == this)
                 return true;
 
             var other = obj as ManagerListenerWrap;
-            return Listener.Equals(other.LastCallMD5);
+            return Listener.Equals(other.Listener);
+        }
+
+        public override int GetHashCode()
+        {
+            return Listener.GetHashCode();
         }
     }
 }
