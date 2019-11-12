@@ -71,7 +71,7 @@ namespace Sino.Nacos.Config.Net
             }
             else
             {
-                if (string.IsNullOrEmpty(_config.Namespace))
+                if (string.IsNullOrEmpty(config.Namespace))
                 {
                     _name = _endpoint;
                 }

@@ -53,7 +53,7 @@ namespace Sino.Nacos.Config.Core
                 {
                     _logger.Error(ex, $"[{_agent.GetName()}] [sub-check] rotate check error");
                 }
-            }, null, 1, 10);
+            }, null, 1, 100);
         }
 
         private void Init(ConfigParam config)
@@ -116,7 +116,7 @@ namespace Sino.Nacos.Config.Core
             }
         }
 
-        public CacheData AddCacheDataIfAbsent(string dataId, string group)
+        private CacheData AddCacheDataIfAbsent(string dataId, string group)
         {
             CacheData cache = GetCache(dataId, group);
             if (cache != null)
@@ -144,7 +144,7 @@ namespace Sino.Nacos.Config.Core
             return cache;
         }
 
-        public async Task<CacheData> AddCacheDataIfAbsent(string dataId, string group, string tenant)
+        private async Task<CacheData> AddCacheDataIfAbsent(string dataId, string group, string tenant)
         {
             var cache = GetCache(dataId, group, tenant);
             if (cache != null)
@@ -263,12 +263,12 @@ namespace Sino.Nacos.Config.Core
             }
         }
 
-        public CacheData GetCache(string dataId, string group)
+        private CacheData GetCache(string dataId, string group)
         {
             return GetCache(dataId, group, Constants.DEFAULT_TENANT_ID);
         }
 
-        public CacheData GetCache(string dataId, string group, string tenant)
+        private CacheData GetCache(string dataId, string group, string tenant)
         {
             if (string.IsNullOrEmpty(dataId))
                 throw new ArgumentNullException(nameof(dataId));
@@ -288,7 +288,7 @@ namespace Sino.Nacos.Config.Core
             return string.IsNullOrEmpty(group) ? Constants.DEFAULT_GROUP : group.Trim();
         }
 
-        public void CheckConfigInfo()
+        private void CheckConfigInfo()
         {
             int listenerSize = _cacheMap.Count;
             int longingTaskCount = (int)Math.Ceiling(listenerSize / UtilAndComs.PER_TASK_CONFIG_SIZE);
@@ -296,8 +296,11 @@ namespace Sino.Nacos.Config.Core
             {
                 for (int i = (int)_currentLongingTaskCount; i < longingTaskCount; i++)
                 {
-                    var t = LongPolling(i);
-                    _longPollingMap.AddOrUpdate(i, t, (k, v) => t);
+                    if (!_longPollingMap.ContainsKey(i))
+                    {
+                        var t = LongPolling(i);
+                        _longPollingMap.AddOrUpdate(i, t, (k, v) => t);
+                    }
                 }
                 _currentLongingTaskCount = longingTaskCount;
             }
@@ -347,7 +350,7 @@ namespace Sino.Nacos.Config.Core
 
             if (string.IsNullOrEmpty(probeUpdateString))
             {
-                return null;
+                return new List<string>();
             }
 
             try
@@ -371,7 +374,7 @@ namespace Sino.Nacos.Config.Core
                 _logger.Error(ex, $"[{_agent.GetName()}] [check-update] get changed dataId exception");
                 throw ex;
             }
-            return null;
+            return new List<string>();
         }
 
         private IList<string> ParseUpdateDataIdResponse(string response)
@@ -485,7 +488,7 @@ namespace Sino.Nacos.Config.Core
                     Timer t = null;
                     if (_longPollingMap.TryGetValue(selfTaskId, out t))
                     {
-                        t.Change(0, Timeout.Infinite);
+                        t.Change(1, Timeout.Infinite);
                     }
                 }
                 catch(Exception ex)

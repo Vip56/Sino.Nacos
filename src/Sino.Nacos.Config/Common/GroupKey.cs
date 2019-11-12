@@ -97,13 +97,13 @@ namespace Sino.Nacos.Config.Common
                 {
                     throw new ArgumentException($"Invalid groupKey:{groupKey}");
                 }
-                else
+            }
+            else
+            {
+                tenant = sb.ToString();
+                if (group.Length == 0)
                 {
-                    tenant = sb.ToString();
-                    if (group.Length == 0)
-                    {
-                        throw new ArgumentException($"Invalid groupKey:{groupKey}");
-                    }
+                    throw new ArgumentException($"Invalid groupKey:{groupKey}");
                 }
             }
 

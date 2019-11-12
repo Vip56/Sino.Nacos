@@ -41,12 +41,20 @@ namespace Sino.Nacos.Config.Net
             }
             else
             {
-                var query = HttpUtility.ParseQueryString(string.Empty, encoding);
-                foreach (var param in paramValues)
+                if (method == HttpMethod.Post)
                 {
-                    query.Add(param.Key, param.Value);
+                    requestMessage.RequestUri = new Uri(url);
+                    requestMessage.Content = new FormUrlEncodedContent(paramValues);
                 }
-                requestMessage.RequestUri = new Uri(url + "?" + query.ToString());
+                else
+                {
+                    var query = HttpUtility.ParseQueryString(string.Empty, encoding);
+                    foreach (var param in paramValues)
+                    {
+                        query.Add(param.Key, param.Value);
+                    }
+                    requestMessage.RequestUri = new Uri(url + "?" + query.ToString());
+                }
             }
 
             SetHeaders(requestMessage.Headers, headers);
