@@ -80,7 +80,7 @@ namespace Sino.Nacos.Config
             return content;
         }
 
-        public async Task<string> GetConfigAndSignListener(string dataId, string group, long timeout, Action<string> listener)
+        public async Task<string> GetConfigAndSignListener(string dataId, string group, Action<string> listener)
         {
             string content = await GetConfig(dataId, group);
             await _worker.AddTenantListenersWithContent(dataId, group, content, listener);
@@ -146,7 +146,7 @@ namespace Sino.Nacos.Config
             {
                 paramValue.Add("appName", appName);
             }
-            if (string.IsNullOrEmpty(tag))
+            if (!string.IsNullOrEmpty(tag))
             {
                 paramValue.Add("tag", tag);
             }
@@ -160,7 +160,7 @@ namespace Sino.Nacos.Config
             try
             {
                 string result = await _agent.Post(url, headers, paramValue);
-                if (string.IsNullOrEmpty(result))
+                if (string.IsNullOrEmpty(result) || result == "false")
                 {
                     _logger.Warn($"[{_agent.GetName()}] [publish-single] error, dataId={dataId}, group={group}, tenant={tenant}");
                     return false;
@@ -197,7 +197,7 @@ namespace Sino.Nacos.Config
             try
             {
                 string result = await _agent.Delete(url, null, paramValue);
-                if (string.IsNullOrEmpty(result))
+                if (string.IsNullOrEmpty(result) || result == "false")
                 {
                     _logger.Warn($"[{_agent.GetName()}] [remove] error, dataId={dataId}, group={group}, tenant={tenant}");
                     return false;

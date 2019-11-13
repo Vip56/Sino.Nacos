@@ -22,9 +22,8 @@ namespace Sino.Nacos.Config
         /// </summary>
         /// <param name="dataId">数据编号</param>
         /// <param name="group">分组</param>
-        /// <param name="timeout">超时时间，单位毫秒</param>
         /// <param name="listener">监听回调</param>
-        Task<string> GetConfigAndSignListener(string dataId, string group, long timeout, Action<string> listener);
+        Task<string> GetConfigAndSignListener(string dataId, string group, Action<string> listener);
 
         /// <summary>
         /// 监听配置
