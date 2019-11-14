@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Company>江苏斯诺物联科技有限公司</Company>
+    <Authors>y-z-f</Authors>
+    <Version>1.0.0-beta1</Version>
+    <Description>提供Nacos的配置管理</Description>
+    <PackageLicenseUrl>https://github.com/Vip56/Sino.Nacos/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Vip56/Sino.Nacos</PackageProjectUrl>
+    <PackageIconUrl>http://avatars0.githubusercontent.com/u/16951448?v=3&amp;s=70</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Vip56/Sino.Nacos</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>netstandard;config-client;nacos;nacos-client-csharp</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
