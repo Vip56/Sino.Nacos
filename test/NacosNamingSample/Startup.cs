@@ -25,7 +25,8 @@ namespace NacosNamingSample
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddHttpClient();
-            services.AddNacosNaming(Configuration.GetSection("NacosNaming"));
+            //services.AddNacosNaming(Configuration.GetSection("NacosNaming"));
+            services.AddNacosConfig(Configuration.GetSection("NacosConfig"));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -36,7 +37,7 @@ namespace NacosNamingSample
             }
 
             app.UseMvc();
-            app.AutoRegisterNacosNaming();
+            //app.AutoRegisterNacosNaming();
         }
     }
 }
