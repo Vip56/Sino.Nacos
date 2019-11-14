@@ -32,6 +32,7 @@ namespace Sino.Nacos.Config.Core
         private double _currentLongingTaskCount = 0;
         private long _timeout;
         private int _taskPenaltyTime;
+        private Timer _selfCheckConfigTimer;
 
         public bool IsHealthServer { get; set; }
 
@@ -43,7 +44,7 @@ namespace Sino.Nacos.Config.Core
 
             Init(config);
 
-            new Timer(x =>
+            _selfCheckConfigTimer = new Timer(x =>
             {
                 try
                 {
@@ -53,7 +54,12 @@ namespace Sino.Nacos.Config.Core
                 {
                     _logger.Error(ex, $"[{_agent.GetName()}] [sub-check] rotate check error");
                 }
-            }, null, 1, 100);
+
+                if (_selfCheckConfigTimer != null)
+                {
+                    _selfCheckConfigTimer.Change(100, Timeout.Infinite);
+                }
+            }, null, 1, Timeout.Infinite);
         }
 
         private void Init(ConfigParam config)
@@ -185,9 +191,11 @@ namespace Sino.Nacos.Config.Core
 
             try
             {
-                var param = new Dictionary<string, string>();
-                param.Add("dataId", dataId);
-                param.Add("group", group);
+                var param = new Dictionary<string, string>
+                {
+                    { "dataId", dataId },
+                    { "group", group }
+                };
                 if (!string.IsNullOrEmpty(tenant))
                 {
                     param.Add("tenant", tenant);
@@ -299,7 +307,7 @@ namespace Sino.Nacos.Config.Core
                     if (!_longPollingMap.ContainsKey(i))
                     {
                         var t = LongPolling(i);
-                        _longPollingMap.AddOrUpdate(i, t, (k, v) => t);
+                        _longPollingMap.TryAdd(i, t);
                     }
                 }
                 _currentLongingTaskCount = longingTaskCount;
@@ -330,7 +338,7 @@ namespace Sino.Nacos.Config.Core
                     }
                 }
             }
-            bool isInitializingCacheList = inInitializingCacheList.Count >= 0;
+            bool isInitializingCacheList = inInitializingCacheList.Count > 0;
             return CheckUpdateConfigStr(sb.ToString(), isInitializingCacheList);
             
         }
@@ -393,6 +401,8 @@ namespace Sino.Nacos.Config.Core
                 if (!string.IsNullOrEmpty(dataIdAndGroup))
                 {
                     var keyArr = dataIdAndGroup.Split(Constants.WORD_SEPARATOR);
+                    if (keyArr.Length < 2)
+                        continue;
                     string dataId = keyArr[0];
                     string group = keyArr[1];
                     if (keyArr.Length == 2)

@@ -9,7 +9,7 @@ namespace Sino.Nacos.Config
         public const string DEFAULT_GROUP = "DEFAULT_GROUP";
         public const string DEFAULT_TENANT_ID = "nacosconfig";
 
-        public const string BASE_PATH = "/v1/cs";
+        public const string BASE_PATH = "/nacos/v1/cs";
         public const string CONFIG_CONTROLLER_PATH = BASE_PATH + "/configs";
         public const string PROBE_MODIFY_REQUEST = "Listening-Configs";
 

@@ -34,6 +34,11 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var namingService = app.ApplicationServices.GetService<INamingService>();
 
+            if (namingService == null)
+            {
+                throw new System.InvalidOperationException("The Nacos NamingService is not register");
+            }
+
             namingService.AutoRegister().Wait();
 
             return app;

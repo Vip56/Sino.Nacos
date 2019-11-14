@@ -21,7 +21,7 @@ namespace Sino.Nacos.Config.Utils
                 StringBuilder builder = new StringBuilder();
                 for (int i = 0; i < data.Length; i++)
                 {
-                    builder.Append(data[i].ToString("X2"));
+                    builder.Append(data[i].ToString("x2"));
                 }
                 return builder.ToString();
             }

@@ -17,25 +17,9 @@ namespace Sino.Nacos.Config
         public IList<string> ServerAddr { get; set; }
 
         /// <summary>
-        /// 内容路径
-        /// </summary>
-        public string ContentPath { get; set; }
-
-        /// <summary>
-        /// 集群名称
-        /// </summary>
-        public string ClusterName { get; set; }
-
-        /// <summary>
         /// 提供Nacos服务地址的地址
         /// </summary>
         public string EndPoint { get; set; }
-
-        public string AccessKey { get; set; }
-
-        public string SecretKey { get; set; }
-
-        public long ConnectionTimeout { get; set; } = 3000;
 
         /// <summary>
         /// 配置缓存文件根路径

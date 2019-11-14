@@ -30,8 +30,8 @@ namespace Sino.Nacos.Config.Net
         {
             var client = _httpClientFactory.CreateClient();
 
-            if (client.Timeout.TotalMilliseconds != _config.ConnectionTimeout)
-                client.Timeout = TimeSpan.FromMilliseconds(_config.ConnectionTimeout);
+            if (client.Timeout.TotalMilliseconds != _config.ConfigLongPollTimeout)
+                client.Timeout = TimeSpan.FromMilliseconds(_config.ConfigLongPollTimeout);
 
             HttpRequestMessage requestMessage = new HttpRequestMessage();
             requestMessage.Method = method;
