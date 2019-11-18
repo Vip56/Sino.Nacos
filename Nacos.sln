@@ -22,7 +22,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NacosNamingSample", "test\N
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sino.Nacos.Config", "src\Sino.Nacos.Config\Sino.Nacos.Config.csproj", "{94FD9CD7-F220-4B53-A430-8CFBAE5F7735}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NacosConfigUnitTest", "test\NacosConfigUnitTest\NacosConfigUnitTest.csproj", "{0053587B-CD95-4039-90B3-9B098F837E0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NacosConfigUnitTest", "test\NacosConfigUnitTest\NacosConfigUnitTest.csproj", "{0053587B-CD95-4039-90B3-9B098F837E0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NacosBenchmark", "test\NacosBenchmark\NacosBenchmark.csproj", "{EE94636E-07CF-471C-976E-CAB998328DD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{0053587B-CD95-4039-90B3-9B098F837E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0053587B-CD95-4039-90B3-9B098F837E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0053587B-CD95-4039-90B3-9B098F837E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE94636E-07CF-471C-976E-CAB998328DD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE94636E-07CF-471C-976E-CAB998328DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE94636E-07CF-471C-976E-CAB998328DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE94636E-07CF-471C-976E-CAB998328DD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{15153D47-7A1A-4852-9A17-468AFB618F93} = {296B3395-F271-445E-B2CD-185DDBD54BE0}
 		{94FD9CD7-F220-4B53-A430-8CFBAE5F7735} = {01B3759B-FA05-4356-B8A4-88A94ABDFDFB}
 		{0053587B-CD95-4039-90B3-9B098F837E0B} = {296B3395-F271-445E-B2CD-185DDBD54BE0}
+		{EE94636E-07CF-471C-976E-CAB998328DD5} = {296B3395-F271-445E-B2CD-185DDBD54BE0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C178F4C-FD35-41B6-899B-A6BB84B46B13}
